@@ -89,19 +89,20 @@ export default function SplashPage() {
           display:'flex', flexDirection:'column', alignItems:'center',
         }}>
           <div style={{
-            width:136, height:136, borderRadius:'50%',
-            background:'rgba(255,255,255,.13)', backdropFilter:'blur(24px)',
+            width:136, height:136, borderRadius:32,
+            background:'rgba(255,255,255,.15)', backdropFilter:'blur(24px)',
             border:'2px solid rgba(255,255,255,.35)',
             display:'flex', alignItems:'center', justifyContent:'center',
             animation:'ringGlow 2.2s ease-in-out infinite alternate',
-            position:'relative',
+            position:'relative', overflow:'hidden',
           }}>
             <div style={{
-              position:'absolute', inset:8, borderRadius:'50%',
+              position:'absolute', inset:8, borderRadius:24,
               border:'1.5px dashed rgba(255,255,255,.3)',
               animation:'ringRotate 10s linear infinite',
             }} />
-            <span style={{ fontSize:58, color:'#fff', textShadow:'0 0 36px rgba(255,255,255,.9)', position:'relative', zIndex:2 }}>✚</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/Logo Oria Care 192 par 192.png" alt="Oria Care" style={{ width:100, height:100, objectFit:'contain', position:'relative', zIndex:2 }} />
           </div>
 
           <div style={{
@@ -113,10 +114,10 @@ export default function SplashPage() {
             backgroundClip:'text',
             animation:'shimmerName 4s linear infinite',
           }}>
-            SHIDO
+            Oria Care
           </div>
           <div style={{ fontSize:12, color:'rgba(255,255,255,.65)', letterSpacing:7, textTransform:'uppercase', marginTop:5 }}>
-            Connect
+            Votre santé
           </div>
         </div>
 
