@@ -42,7 +42,8 @@ export default function LoginPage() {
         const patient = localAuth.login(phone, password)
         const token = localAuth.makeToken(phone)
         storage.setToken(token)
-        storage.setPatient(patient as Parameters<typeof storage.setPatient>[0])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        storage.setPatient(patient as any)
         router.replace('/home')
       } catch (localErr: unknown) {
         setError(localErr instanceof Error ? localErr.message : 'Identifiants incorrects')
@@ -66,7 +67,8 @@ export default function LoginPage() {
         const patient = localAuth.register(phone, password, firstName, lastName)
         const token = localAuth.makeToken(phone)
         storage.setToken(token)
-        storage.setPatient(patient as Parameters<typeof storage.setPatient>[0])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        storage.setPatient(patient as any)
         router.replace('/home')
       } catch (localErr: unknown) {
         setError(localErr instanceof Error ? localErr.message : "Erreur lors de la création du compte")
