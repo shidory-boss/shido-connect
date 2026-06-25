@@ -1,7 +1,7 @@
-// ShidoConnect — Service Worker v2
+// Oria Care — Service Worker v3
 // Offline cache + Push notifications
 
-const CACHE_NAME = 'shido-connect-v2'
+const CACHE_NAME = 'oria-care-v3'
 const OFFLINE_URL = '/'
 
 const CACHE_URLS = [
@@ -70,7 +70,7 @@ self.addEventListener('push', event => {
   let data = {}
   try { data = event.data ? event.data.json() : {} } catch { data = { body: event.data?.text() || '' } }
 
-  const title = data.title || 'ShidoConnect'
+  const title = data.title || 'Oria Care'
   const options = {
     body:    data.body || data.message || "Vous avez une notification",
     icon:    '/icons/icon-192x192.png',
