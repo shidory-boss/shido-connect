@@ -122,11 +122,11 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'0 20px 28px' }}>
             <button onClick={() => router.back()} style={{ position:'absolute', top:52, left:20, width:40,height:40,borderRadius:13,background:'rgba(255,255,255,.18)',border:'1.5px solid rgba(255,255,255,.3)',color:'#fff',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',backdropFilter:'blur(10px)' }}>←</button>
             <div style={{ fontSize:36, marginBottom:8 }}>{s.icon}</div>
-            <div style={{ fontSize:11, fontWeight:800, color:s.color, letterSpacing:'2px', textTransform:'uppercase', marginBottom:6 }}>Spécialité médicale</div>
+            <div style={{ fontSize:11, fontWeight:800, color:'#a8edda', letterSpacing:'2px', textTransform:'uppercase', marginBottom:6 }}>Spécialité médicale</div>
             <div style={{ fontSize:26, fontWeight:900, color:'#fff', lineHeight:1.2 }}>{s.label}</div>
             <div style={{ display:'flex', gap:12, marginTop:12 }}>
               <div style={{ background:'rgba(255,255,255,.15)', backdropFilter:'blur(10px)', borderRadius:10, padding:'6px 12px', fontSize:11, color:'#fff', fontWeight:700 }}>⏱ {s.duration}</div>
-              <div style={{ background:`${s.color}33`, backdropFilter:'blur(10px)', borderRadius:10, padding:'6px 12px', fontSize:11, color:s.color, fontWeight:700 }}>💰 {s.price}</div>
+              <div style={{ background:'rgba(168,237,218,.2)', backdropFilter:'blur(10px)', borderRadius:10, padding:'6px 12px', fontSize:11, color:'#a8edda', fontWeight:700 }}>💰 {s.price}</div>
             </div>
           </div>
         </div>
