@@ -65,7 +65,7 @@ export default function ChatPage() {
     })
       .then(r => r.ok ? r.json() : [])
       .then((list: RealThread[]) => { if (list.length > 0) setThread(list[0]) })
-      .catch(() => setError('Impossible de charger les messages'))
+      .catch(() => {}) // backend indisponible — pas d'erreur affichée
   }, [])
 
   if (!mounted) return null
@@ -160,7 +160,7 @@ export default function ChatPage() {
           ))}
         </div>
 
-        {error && <div style={{ margin:'12px 20px', padding:'10px 14px', background:'#FEF2F2', borderRadius:12, fontSize:12, color:'#DC2626', fontWeight:700 }}>⚠️ {error}</div>}
+        {/* error supprimé — backend indisponible ne doit pas perturber le patient */}
 
         <div style={{ margin:'12px 20px', padding:'12px 16px', background:'#EEF9F5', borderRadius:14, border:`1px solid ${ACC}22` }}>
           <div style={{ fontSize:12, fontWeight:700, color:ACC }}>
