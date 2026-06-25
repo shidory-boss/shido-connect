@@ -8,7 +8,13 @@ const ACC2 = '#0F6E56'
 
 const CRENEAUX = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00']
 
-type Doctor = { id: number; first_name: string; last_name: string; specialite?: string }
+type Doctor = { id: number; first_name: string; last_name: string; specialite?: string; img?: string }
+
+const FALLBACK_DOCTORS: Doctor[] = [
+  { id: 1, first_name: 'Yanick', last_name: 'Oulaï',   specialite: 'Médecine générale',  img: '/images/Docteurs/Docteur africain 600x800.png' },
+  { id: 2, first_name: 'Franck', last_name: 'Kouamé',  specialite: 'Médecine interne',   img: '/images/Docteurs/Docteur africain final 600x800.png' },
+  { id: 3, first_name: 'Christy', last_name: 'Onamon', specialite: 'Médecine générale',  img: '/images/Docteurs/Femme docteur 600x800 final.png' },
+]
 
 export default function TeleconsultPage() {
   const router = useRouter()
@@ -29,9 +35,7 @@ export default function TeleconsultPage() {
     setCalendar(days)
     publicAppointmentApi.getDoctors()
       .then(list => setDoctors(list))
-      .catch(() => setDoctors([
-        { id: 1, first_name: 'Jean', last_name: 'Kouamé', specialite: 'Médecine générale' },
-      ]))
+      .catch(() => setDoctors(FALLBACK_DOCTORS))
   }, [])
 
   const fmtDate = (iso: string) => {
@@ -98,9 +102,12 @@ export default function TeleconsultPage() {
                       border:`1.5px solid ${isActive ? ACC : '#e2e8f0'}`,
                       background: isActive ? ACC+'0e' : '#f8fafc',
                     }}>
-                      <div style={{ width:50,height:50,borderRadius:16,background:isActive?ACC+'22':'#e2e8f0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,flexShrink:0,position:'relative' }}>
-                        👨‍⚕️
-                        <span style={{ position:'absolute',bottom:1,right:1,width:12,height:12,borderRadius:'50%',background:'#4ade80',border:'2px solid #fff',animation:'pulseDot 1.5s ease-in-out infinite' }}/>
+                      <div style={{ width:56,height:56,borderRadius:16,overflow:'hidden',flexShrink:0,position:'relative',border:`2px solid ${isActive ? ACC : '#e2e8f0'}` }}>
+                        {d.img
+                          ? <img src={d.img} alt={d.first_name} style={{ width:'100%',height:'100%',objectFit:'cover',objectPosition:'top' }} />
+                          : <div style={{ width:'100%',height:'100%',background:isActive?ACC+'22':'#e2e8f0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:24 }}>👨‍⚕️</div>
+                        }
+                        <span style={{ position:'absolute',bottom:2,right:2,width:11,height:11,borderRadius:'50%',background:'#4ade80',border:'2px solid #fff',animation:'pulseDot 1.5s ease-in-out infinite' }}/>
                       </div>
                       <div style={{ flex:1 }}>
                         <div style={{ fontSize:14, fontWeight:900, color:'#0f172a' }}>{name}</div>
