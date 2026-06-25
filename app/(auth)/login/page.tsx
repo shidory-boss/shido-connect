@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { authApi } from '@/lib/api'
 import { storage } from '@/lib/storage'
 import { usePWAConfig } from '@/core/PWAConfigContext'
+import { localAuth } from '@/lib/localAuth'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -30,12 +31,22 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
     try {
+      // Essaie le backend d'abord
       const res = await authApi.login(phone, password)
       storage.setToken(res.access_token)
       storage.setPatient(res.patient)
       router.replace('/home')
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Identifiants incorrects')
+    } catch {
+      // Backend indisponible → auth locale
+      try {
+        const patient = localAuth.login(phone, password)
+        const token = localAuth.makeToken(phone)
+        storage.setToken(token)
+        storage.setPatient(patient as Parameters<typeof storage.setPatient>[0])
+        router.replace('/home')
+      } catch (localErr: unknown) {
+        setError(localErr instanceof Error ? localErr.message : 'Identifiants incorrects')
+      }
     } finally { setLoading(false) }
   }
 
@@ -44,12 +55,22 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
     try {
+      // Essaie le backend d'abord
       const res = await authApi.register({ first_name: firstName, last_name: lastName, phone, password })
       storage.setToken(res.access_token)
       storage.setPatient(res.patient)
       router.replace('/home')
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'inscription')
+    } catch {
+      // Backend indisponible → crée un compte local
+      try {
+        const patient = localAuth.register(phone, password, firstName, lastName)
+        const token = localAuth.makeToken(phone)
+        storage.setToken(token)
+        storage.setPatient(patient as Parameters<typeof storage.setPatient>[0])
+        router.replace('/home')
+      } catch (localErr: unknown) {
+        setError(localErr instanceof Error ? localErr.message : "Erreur lors de la création du compte")
+      }
     } finally { setLoading(false) }
   }
 
