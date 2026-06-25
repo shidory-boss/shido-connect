@@ -162,7 +162,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
         </div>
 
         {/* ── BOUTON RDV FIXE EN BAS ── */}
-        <div style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:480, padding:'12px 20px 24px', background:'linear-gradient(to top,#fff 70%,transparent)', zIndex:100 }}>
+        <div style={{ position:'fixed', bottom:72, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:480, padding:'12px 20px', background:'linear-gradient(to top,#fff 70%,transparent)', zIndex:100 }}>
           <Link href={`/booking?service=${encodeURIComponent(s.label)}`} style={{ textDecoration:'none' }}>
             <button className="rdv-btn" style={{ width:'100%', padding:'16px', borderRadius:18, background:`linear-gradient(135deg,${s.dark},${s.color})`, border:'none', color:'#fff', fontSize:15, fontWeight:900, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:`0 10px 32px ${s.color}55`, display:'flex', alignItems:'center', justifyContent:'center', gap:10 }}>
               📅 Prendre rendez-vous
