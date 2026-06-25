@@ -32,7 +32,9 @@ const securityHeaders = [
 
 let finalConfig: NextConfig = {
   images: { unoptimized: true },
-  turbopack: {},
+  turbopack: {
+    root: __dirname,
+  },
   async headers() {
     return [
       {

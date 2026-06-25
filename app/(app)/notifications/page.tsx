@@ -8,11 +8,11 @@ const ACC2 = '#0F6E56'
 type Notif = { id:number; icon:string; title:string; body:string; time:string; read:boolean; color:string }
 
 const INITIAL_NOTIFS: Notif[] = [
-  { id:1, icon:'📅', title:'Rappel Rendez-vous', body:'RDV avec Dr. Shidory demain à 10:00. Cocody, Oria Care.', time:'Il y a 2 heures', read:false, color:'#0B1D35' },
+  { id:1, icon:'📅', title:'Rappel Rendez-vous', body:'Votre prochain rendez-vous est confirmé. Consultez votre espace pour les détails.', time:'Il y a 2 heures', read:false, color:'#0B1D35' },
   { id:2, icon:'✅', title:'Résultats Disponibles', body:'Vos résultats d\'analyse sanguine (NFS) sont disponibles dans votre espace.', time:'Il y a 5 heures', read:false, color:'#10B981' },
   { id:3, icon:'💊', title:'Rappel Médicament', body:'N\'oubliez pas votre Paracétamol 500mg ce soir à 20:00.', time:'Il y a 8 heures', read:false, color:'#8B5CF6' },
   { id:4, icon:'⭐', title:'Évaluez votre Consultation', body:'Comment s\'est passée votre consultation avec Dr. Yan ?', time:'Hier', read:true, color:'#F59E0B' },
-  { id:5, icon:'🎉', title:'Bienvenue chez ShidoConnect !', body:'Votre compte est créé avec succès. Prenez bien soin de vous.', time:'Il y a 3 jours', read:true, color:ACC },
+  { id:5, icon:'🎉', title:'Bienvenue chez Oria Care !', body:'Votre compte est créé avec succès. Prenez bien soin de vous.', time:'Il y a 3 jours', read:true, color:ACC },
 ]
 
 export default function NotificationsPage() {

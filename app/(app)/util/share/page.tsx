@@ -2,8 +2,8 @@
 import { useState } from 'react';
 
 const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://app.shidoconnect.ci';
-const APP_TITLE = 'ShidoConnect';
-const APP_TEXT = 'Gérez votre santé facilement avec ShidoConnect — rendez-vous, résultats, ordonnances.';
+const APP_TITLE = 'Oria Care';
+const APP_TEXT = 'Gérez votre santé facilement avec Oria Care — rendez-vous, résultats, ordonnances.';
 
 export default function SharePage() {
   const [copied, setCopied] = useState(false);
@@ -184,7 +184,7 @@ export default function SharePage() {
                 minWidth: 240,
               }}
             >
-              <span style={{ fontWeight: 800, fontSize: 16 }}>QR Code ShidoConnect</span>
+              <span style={{ fontWeight: 800, fontSize: 16 }}>QR Code Oria Care</span>
               {/* QR placeholder */}
               <div style={{
                 width: 160,

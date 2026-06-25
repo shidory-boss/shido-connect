@@ -43,7 +43,7 @@ const CERTIFICATIONS = [
 ]
 
 const TIMELINE = [
-  { year: 2021, title: 'Fondation ShidoMedical', desc: 'Lancement du projet à Abidjan.' },
+  { year: 2021, title: 'Fondation Oria Care', desc: 'Lancement du projet à Abidjan.' },
   { year: 2022, title: 'Premier déploiement clinique', desc: '12 cabinets pilotes en Côte d\'Ivoire.' },
   { year: 2023, title: 'Certifications HDS & CE', desc: 'Double agrément pour les données de santé.' },
   { year: 2024, title: 'ISO 27001', desc: 'Sécurité renforcée, audit international réussi.' },

@@ -138,26 +138,57 @@ export default function HomePage() {
   return (
     <>
       <style>{`
-        @keyframes heroFadeUp { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:none} }
-        @keyframes shimmerTxt { 0%{background-position:200% center} 100%{background-position:-200% center} }
-        @keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-        @keyframes scaleIn    { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
-        @keyframes ecgDraw    { from{stroke-dashoffset:900} to{stroke-dashoffset:0} }
-        @keyframes ecgFade    { 0%,85%{opacity:.55} 100%{opacity:0} }
-        @keyframes ripple     { from{transform:scale(0);opacity:.5} to{transform:scale(3);opacity:0} }
-        .svc-card:active { transform:scale(.96) rotate(-1deg)!important; }
-        .rdv-btn:active  { transform:scale(.96)!important; }
-        @keyframes slideRight { from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:none} }
-        @keyframes pulse      { 0%,100%{box-shadow:0 0 0 0 rgba(29,158,117,.45)} 70%{box-shadow:0 0 0 12px rgba(29,158,117,0)} }
-        @keyframes slideUp    { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
-        .svc-card  { transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s; }
-        .svc-card:active  { transform:scale(.95); }
-        .qa-card   { transition:transform .2s cubic-bezier(.34,1.56,.64,1); }
+        @keyframes heroFadeUp  { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:none} }
+        @keyframes shimmerTxt  { 0%{background-position:200% center} 100%{background-position:-200% center} }
+        @keyframes floatBadge  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        @keyframes scaleIn     { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
+        @keyframes ecgDraw     { from{stroke-dashoffset:900} to{stroke-dashoffset:0} }
+        @keyframes ecgFade     { 0%,85%{opacity:.55} 100%{opacity:0} }
+        @keyframes ripple      { from{transform:scale(0);opacity:.5} to{transform:scale(3);opacity:0} }
+        @keyframes slideRight  { from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:none} }
+        @keyframes pulse       { 0%,100%{box-shadow:0 0 0 0 rgba(29,158,117,.45)} 70%{box-shadow:0 0 0 12px rgba(29,158,117,0)} }
+        @keyframes slideUp     { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+        /* float doux — même esprit que le badge "Ouvert maintenant" */
+        @keyframes floatA { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-5px)} }
+        @keyframes floatB { 0%,100%{transform:translateY(-3px)} 50%{transform:translateY(3px)}  }
+        @keyframes floatC { 0%,100%{transform:translateY(-2px)} 50%{transform:translateY(4px)}  }
+        @keyframes floatD { 0%,100%{transform:translateY(2px)}  50%{transform:translateY(-4px)} }
+
+        /* shimmer lumière sur boutons CTA */
+        @keyframes btnShimmer {
+          0%   { background-position:-200% center; }
+          100% { background-position:200% center; }
+        }
+        /* glow bordure pulsante sur carte CTA */
+        @keyframes borderGlow {
+          0%,100% { box-shadow:0 16px 48px rgba(29,158,117,.35); }
+          50%      { box-shadow:0 16px 64px rgba(29,158,117,.7), 0 0 0 3px rgba(29,158,117,.25); }
+        }
+        /* zoom subtil sur photos docteurs */
+        @keyframes docZoom {
+          0%,100% { transform:scale(1); }
+          50%      { transform:scale(1.04); }
+        }
+        /* pulse sur la carte RDV principale */
+        @keyframes cardPulse {
+          0%,100% { box-shadow:0 8px 24px rgba(29,158,117,.2); }
+          50%      { box-shadow:0 8px 40px rgba(29,158,117,.5); }
+        }
+
+        .svc-card   { transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s; }
+        .svc-card:active  { transform:scale(.95) rotate(-1deg); }
+        .qa-card    { transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s; }
         .qa-card:active   { transform:scale(.93); }
-        .rdv-btn   { transition:all .25s; }
+        .rdv-btn    { transition:all .25s; }
         .rdv-btn:hover    { transform:translateY(-2px); filter:brightness(1.07); }
         .rdv-btn:active   { transform:scale(.96); }
         .team-card:hover .team-overlay { opacity:1!important; }
+        .team-img   { animation:docZoom 6s ease-in-out infinite; }
+        .cta-btn-shimmer {
+          background: linear-gradient(90deg,#fff 0%,rgba(255,255,255,.55) 40%,#fff 55%,rgba(255,255,255,.55) 100%) 200% center / 300% auto;
+          animation: btnShimmer 3.5s linear infinite;
+        }
       `}</style>
 
       <div ref={scrollRef} style={{ minHeight:'100vh', background:'#f8fafc', fontFamily:'Nunito,system-ui,sans-serif', overflowY:'auto', paddingBottom:88 }}>
@@ -216,7 +247,7 @@ export default function HomePage() {
 
             <div style={{ display:'flex', gap:10, marginBottom:0, animation:'heroFadeUp .7s ease .3s both' }}>
               <Link href="/booking" style={{ textDecoration:'none', flex:1 }}>
-                <button className="rdv-btn" style={{ width:'100%', padding:'13px', borderRadius:16, background:`linear-gradient(135deg,${acc2},${acc})`, border:'none', color:'#fff', fontSize:13, fontWeight:900, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:`0 10px 30px ${acc}55` }}>
+                <button className="rdv-btn" style={{ width:'100%', padding:'13px', borderRadius:16, background:`linear-gradient(135deg,${acc2},${acc})`, border:'none', color:'#fff', fontSize:13, fontWeight:900, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:`0 10px 30px ${acc}55`, animation:'floatA 3s ease-in-out infinite' }}>
                   📅 Prendre RDV
                 </button>
               </Link>
@@ -234,14 +265,22 @@ export default function HomePage() {
           <div style={{ background:'#fff', borderRadius:24, padding:'18px 16px', boxShadow:'0 16px 48px rgba(0,0,0,.14)', border:'1px solid rgba(255,255,255,.8)' }}>
             <div style={{ fontSize:11, fontWeight:800, color:'#94a3b8', letterSpacing:'1.5px', textTransform:'uppercase', marginBottom:14, textAlign:'center' }}>Espace patient</div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:10 }}>
-              {QUICK_ACTIONS.map((a, i) => (
-                <Link key={a.href} href={a.href} style={{ textDecoration:'none' }}>
-                  <div className="qa-card" style={{ background:`${a.color}12`, borderRadius:18, padding:'14px 12px', textAlign:'center', border:`1.5px solid ${a.color}28`, animation:`slideUp .4s ease ${i*0.07}s both` }}>
-                    <div style={{ fontSize:26, marginBottom:6 }}>{a.icon}</div>
-                    <div style={{ fontSize:11, fontWeight:900, color:'#0f172a', lineHeight:1.3 }}>{a.label}</div>
-                  </div>
-                </Link>
-              ))}
+              {QUICK_ACTIONS.map((a, i) => {
+                const floats = ['floatA','floatB','floatC','floatD']
+                const delays = ['.1s','.35s','.6s','.85s']
+                return (
+                  <Link key={a.href} href={a.href} style={{ textDecoration:'none' }}>
+                    <div className="qa-card" style={{
+                      background:`${a.color}12`, borderRadius:18, padding:'14px 12px', textAlign:'center',
+                      border:`1.5px solid ${a.color}28`,
+                      animation:`slideUp .4s ease ${i*0.07}s both, ${floats[i]} ${3.5+i*0.4}s ease-in-out ${delays[i]} infinite`,
+                    }}>
+                      <div style={{ fontSize:26, marginBottom:6 }}>{a.icon}</div>
+                      <div style={{ fontSize:11, fontWeight:900, color:'#0f172a', lineHeight:1.3 }}>{a.label}</div>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -285,7 +324,7 @@ export default function HomePage() {
 
         {/* ══ CTA RDV ══ */}
         <div style={{ margin:'32px 20px 0' }}>
-          <div style={{ background:`linear-gradient(135deg,${acc2},${acc})`, borderRadius:28, padding:'28px 24px', position:'relative', overflow:'hidden', boxShadow:`0 16px 48px ${acc}44` }}>
+          <div style={{ background:`linear-gradient(135deg,${acc2},${acc})`, borderRadius:28, padding:'28px 24px', position:'relative', overflow:'hidden', animation:'borderGlow 3s ease-in-out infinite' }}>
             <div style={{ position:'absolute', top:'-40px', right:'-40px', width:180, height:180, borderRadius:'50%', background:'rgba(255,255,255,.1)' }} />
             <div style={{ position:'absolute', bottom:'-30px', left:'-30px', width:120, height:120, borderRadius:'50%', background:'rgba(255,255,255,.07)' }} />
             <div style={{ position:'relative', zIndex:2 }}>
@@ -296,7 +335,7 @@ export default function HomePage() {
               </div>
               <div style={{ display:'flex', gap:10 }}>
                 <Link href="/booking" style={{ textDecoration:'none', flex:1 }}>
-                  <button className="rdv-btn" style={{ width:'100%', padding:'14px', borderRadius:16, background:'#fff', border:'none', color:acc2, fontSize:14, fontWeight:900, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:'0 8px 24px rgba(0,0,0,.2)' }}>
+                  <button className="rdv-btn cta-btn-shimmer" style={{ width:'100%', padding:'14px', borderRadius:16, border:'none', color:acc2, fontSize:14, fontWeight:900, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:'0 8px 24px rgba(0,0,0,.2)' }}>
                     📅 Réserver maintenant
                   </button>
                 </Link>
@@ -320,9 +359,9 @@ export default function HomePage() {
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
             {TEAM.map((m, i) => (
-              <div key={i} className="team-card" style={{ background:'#fff', borderRadius:24, overflow:'hidden', boxShadow:'0 8px 28px rgba(0,0,0,.1)', display:'flex', animation:`slideRight .5s ease ${i*0.12+0.2}s both` }}>
+              <div key={i} className="team-card" style={{ background:'#fff', borderRadius:24, overflow:'hidden', boxShadow:'0 8px 28px rgba(0,0,0,.1)', display:'flex', animation:`slideRight .5s ease ${i*0.12+0.2}s both, cardPulse ${4+i*0.5}s ease-in-out ${i*0.8}s infinite` }}>
                 <div style={{ width:110, flexShrink:0, position:'relative', overflow:'hidden' }}>
-                  <img src={m.img} alt={m.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+                  <img src={m.img} alt={m.name} className="team-img" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', animationDelay:`${i*1.2}s` }} />
                   <div className="team-overlay" style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${acc2}cc,${acc}cc)`, opacity:0, transition:'opacity .3s' }} />
                 </div>
                 <div style={{ flex:1, padding:'18px 16px' }}>
@@ -422,8 +461,8 @@ export default function HomePage() {
               </Link>
             </div>
             <div style={{ marginTop:24, paddingTop:20, borderTop:'1px solid rgba(255,255,255,.1)', textAlign:'center' }}>
-              <div style={{ fontSize:13, fontWeight:800, color:'rgba(255,255,255,.8)' }}>ShidoConnect · {name}</div>
-              <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', fontWeight:600, marginTop:4 }}>Abidjan, Côte d&apos;Ivoire · Propulsé par ShidoOS</div>
+              <div style={{ fontSize:13, fontWeight:800, color:'rgba(255,255,255,.8)' }}>Oria Care · {name}</div>
+              <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', fontWeight:600, marginTop:4 }}>Abidjan, Côte d&apos;Ivoire · Propulsé par Oria Care</div>
             </div>
           </div>
         </div>

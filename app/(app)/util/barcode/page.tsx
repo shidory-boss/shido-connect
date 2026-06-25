@@ -15,7 +15,7 @@ export default function BarcodePage() {
     if (raw) setPatient(JSON.parse(raw))
   }, [])
 
-  const name = patient ? `${patient.first_name} ${patient.last_name}` : 'Patient ShidoConnect'
+  const name = patient ? `${patient.first_name} ${patient.last_name}` : 'Patient Oria Care'
   const initials = patient ? `${patient.first_name[0]}${patient.last_name[0]}`.toUpperCase() : 'PS'
   const patId = patient?.phone ? `SHD-2025-${patient.phone.slice(-4)}` : 'SHD-2025-0001'
 

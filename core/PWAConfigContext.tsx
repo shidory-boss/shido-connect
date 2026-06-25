@@ -7,7 +7,7 @@ import { storage } from '@/lib/storage'
 
 const DEFAULT_CONFIG: PWAConfig = {
   clinic_id: 0,
-  clinic_name: 'ShidoConnect',
+  clinic_name: 'Oria Care',
   logo_url: null,
   primary_color: '#1D9E75',
   secondary_color: '#166f52',
@@ -17,7 +17,7 @@ const DEFAULT_CONFIG: PWAConfig = {
   contact_address: '',
   services: [],
   opening_hours: {},
-  pwa_name: 'ShidoConnect',
+  pwa_name: 'Oria Care',
   avion_api_url: process.env.NEXT_PUBLIC_AVION_API_URL || 'http://localhost:8001',
 }
 
@@ -62,10 +62,8 @@ export function PWAConfigProvider({ children }: { children: React.ReactNode }) {
     if (cached) {
       applyConfig(cached)
       setLoading(false)
-      // Rafraîchir en background si expiré
-      if (storage.isConfigStale()) {
-        fetchBackground()
-      }
+      // Toujours rafraîchir en background pour avoir le nom/logo à jour
+      fetchBackground()
       return
     }
     // 2. Pas de cache → fetch bloquant (premier lancement)

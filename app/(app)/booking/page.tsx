@@ -66,12 +66,6 @@ const MOTIFS = [
   {icon:'🤰',label:'Suivi grossesse'},
   {icon:'👶',label:'Pédiatrie'},
 ]
-const DOCTORS = [
-  {id:1, name:'Dr. Kouamé Shidory', spec:'Neurologie', emoji:'👨‍⚕️'},
-  {id:2, name:'Dr. Segou Yan', spec:'Cardiologie', emoji:'👩‍⚕️'},
-  {id:3, name:'Dr. Ahouéfa Koné', spec:'Pédiatrie', emoji:'👩‍⚕️'},
-  {id:4, name:'Dr. Bamba Oumar', spec:'Médecine générale', emoji:'👨‍⚕️'},
-]
 const CRENEAUX = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','14:00','14:30','15:00','15:30','16:00']
 
 const STEPS = [
@@ -105,14 +99,23 @@ const EMPTY: Form = {
   motif:'', doctor_id:null, rdv_date:'', rdv_time:'',
 }
 
-type Doctor = { id: number; first_name: string; last_name: string; specialite?: string }
+type Doctor = { id: number; first_name: string; last_name: string; specialite?: string; img?: string }
+
+const DOCTOR_PHOTOS: Record<string, string> = {
+  'Yanick':  '/images/Docteurs/Docteur africain 600x800.png',
+  'Franck':  '/images/Docteurs/Docteur africain final 600x800.png',
+  'Christy': '/images/Docteurs/Femme docteur 600x800 final.png',
+  'Jean':    '/images/Docteurs/Docteur africain final 600x800.png',
+}
+const getDoctorPhoto = (d: Doctor) => d.img || DOCTOR_PHOTOS[d.first_name]
 
 export default function BookingPage() {
   const router = useRouter()
   const [step, setStep]       = useState(0)
   const [form, setForm]       = useState<Form>(EMPTY)
   const [calendar, setCalendar] = useState<string[]>([])
-  const [doctors, setDoctors] = useState<Doctor[]>(DOCTORS.map(d => ({ id: d.id, first_name: d.name.split(' ')[1] || d.name, last_name: d.name.split(' ')[2] || '', specialite: d.spec })))
+  const [doctors, setDoctors] = useState<Doctor[]>([])
+  const [doctorsLoading, setDoctorsLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
@@ -131,11 +134,19 @@ export default function BookingPage() {
     }
     setCalendar(days)
     // Charger les vrais médecins depuis le backend
-    const baseUrl = (typeof window !== 'undefined' && localStorage.getItem('sc_avion_url')) || 'http://localhost:8001'
-    fetch(`${baseUrl}/api/v1/appointments/public/doctors`)
-      .then(r => r.ok ? r.json() : [])
-      .then((list: {id:number;first_name:string;last_name:string;specialite?:string}[]) => { if (list.length > 0) setDoctors(list) })
-      .catch(() => {})
+    const loadDoctors = async () => {
+      const baseUrl = (typeof window !== 'undefined' && localStorage.getItem('sc_avion_url')) || 'http://localhost:8001'
+      try {
+        const r = await fetch(`${baseUrl}/api/v1/appointments/public/doctors`)
+        if (r.ok) {
+          const list = await r.json()
+          if (Array.isArray(list) && list.length > 0) setDoctors(list)
+        }
+      } catch { /* backend non joignable */ } finally {
+        setDoctorsLoading(false)
+      }
+    }
+    loadDoctors()
   }, [])
 
   // Sanitisation — supprime balises HTML et caractères dangereux
@@ -218,7 +229,12 @@ export default function BookingPage() {
       }))
       router.push('/booking/confirm')
     } catch (e: any) {
-      setSubmitError(e.message || 'Erreur lors de l\'envoi. Réessayez.')
+      const msg = e.message || ''
+      if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('failed')) {
+        setSubmitError('Connexion impossible au serveur. Vérifiez votre connexion et réessayez.')
+      } else {
+        setSubmitError(msg || 'Erreur lors de l\'envoi. Réessayez.')
+      }
       setSubmitting(false)
     }
   }
@@ -267,11 +283,13 @@ export default function BookingPage() {
         @keyframes slideUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
         @keyframes fadeIn    { from{opacity:0} to{opacity:1} }
         @keyframes heroFadeUp{ from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
-        @keyframes floatBadge{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-        @keyframes pulse     { 0%,100%{box-shadow:0 0 0 0 rgba(29,158,117,.5)} 70%{box-shadow:0 0 0 8px rgba(29,158,117,0)} }
+        @keyframes floatBadge  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+        @keyframes pulse       { 0%,100%{box-shadow:0 0 0 0 rgba(29,158,117,.5)} 70%{box-shadow:0 0 0 8px rgba(29,158,117,0)} }
+        @keyframes slotShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
         input:focus,select:focus,textarea:focus { border-color:${ACC} !important; box-shadow:0 0 0 3px ${ACC}22; }
         .chip-btn { transition:all .18s cubic-bezier(.34,1.56,.64,1); }
         .chip-btn:active { transform:scale(.94); }
+        .slot-shimmer { background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.85) 40%,#e8f9f3 60%,#fff 100%) 200% center / 300% auto; animation:slotShimmer 3.2s linear infinite; }
         .step-dot { transition:all .3s cubic-bezier(.34,1.56,.64,1); }
       `}</style>
 
@@ -354,19 +372,39 @@ export default function BookingPage() {
                 <label style={lbl}>Téléphone *</label>
                 <input value={form.phone} onChange={e=>set('phone',e.target.value)} placeholder="07 XX XX XX XX" type="tel" style={inp} />
               </div>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginTop:12 }}>
-                <div>
-                  <label style={lbl}>Date de naissance</label>
-                  <input type="date" value={form.date_of_birth} onChange={e=>set('date_of_birth',e.target.value)} style={inp} />
-                </div>
-                <div>
-                  <label style={lbl}>Genre</label>
-                  <select value={form.gender} onChange={e=>set('gender',e.target.value)} style={sel}>
-                    <option value="">--</option>
-                    <option value="M">Masculin</option>
-                    <option value="F">Féminin</option>
+              <div style={{ marginTop:12 }}>
+                <label style={lbl}>Date de naissance</label>
+                <div style={{ display:'grid', gridTemplateColumns:'2fr 3fr 2fr', gap:8 }}>
+                  <select style={sel} value={form.date_of_birth ? form.date_of_birth.split('-')[2] : ''} onChange={e => {
+                    const [y, m] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01']
+                    if (e.target.value) set('date_of_birth', `${y||'2000'}-${m||'01'}-${e.target.value}`)
+                  }}>
+                    <option value="">Jour</option>
+                    {Array.from({length:31},(_,i)=>i+1).map(d=><option key={d} value={String(d).padStart(2,'0')}>{d}</option>)}
+                  </select>
+                  <select style={sel} value={form.date_of_birth ? form.date_of_birth.split('-')[1] : ''} onChange={e => {
+                    const [y,,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01','01']
+                    if (e.target.value) set('date_of_birth', `${y||'2000'}-${e.target.value}-${d||'01'}`)
+                  }}>
+                    <option value="">Mois</option>
+                    {['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'].map((m,i)=><option key={i} value={String(i+1).padStart(2,'0')}>{m}</option>)}
+                  </select>
+                  <select style={sel} value={form.date_of_birth ? form.date_of_birth.split('-')[0] : ''} onChange={e => {
+                    const [,m,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01','01']
+                    if (e.target.value) set('date_of_birth', `${e.target.value}-${m||'01'}-${d||'01'}`)
+                  }}>
+                    <option value="">Année</option>
+                    {Array.from({length:100},(_,i)=>new Date().getFullYear()-i).map(y=><option key={y} value={y}>{y}</option>)}
                   </select>
                 </div>
+              </div>
+              <div style={{ marginTop:12 }}>
+                <label style={lbl}>Genre</label>
+                <select value={form.gender} onChange={e=>set('gender',e.target.value)} style={sel}>
+                  <option value="">--</option>
+                  <option value="M">Masculin</option>
+                  <option value="F">Féminin</option>
+                </select>
               </div>
             </div>
           )}
@@ -545,8 +583,22 @@ export default function BookingPage() {
               {/* Médecin */}
               <div style={cardStyle}>
                 {cardTitle(BLUE, '👨‍⚕️', 'Choisir un médecin')}
-                {doctors.length === 0 ? (
+                {doctorsLoading ? (
                   <div style={{ textAlign:'center', padding:'20px', color:'#94a3b8', fontSize:13, fontWeight:700 }}>⏳ Chargement des médecins...</div>
+                ) : doctors.length === 0 ? (
+                  <div style={{ textAlign:'center', padding:'20px' }}>
+                    <div style={{ fontSize:13, color:'#EF4444', fontWeight:700, marginBottom:12 }}>⚠️ Impossible de charger les médecins</div>
+                    <button onClick={async () => {
+                      setDoctorsLoading(true)
+                      const baseUrl = localStorage.getItem('sc_avion_url') || 'http://localhost:8001'
+                      try {
+                        const r = await fetch(`${baseUrl}/api/v1/appointments/public/doctors`)
+                        if (r.ok) { const list = await r.json(); if (list.length > 0) setDoctors(list) }
+                      } catch { /* retry */ } finally { setDoctorsLoading(false) }
+                    }} style={{ padding:'10px 20px', borderRadius:12, background:ACC, color:'#fff', border:'none', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                      🔄 Réessayer
+                    </button>
+                  </div>
                 ) : (
                   <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                     {doctors.map(d => {
@@ -559,8 +611,11 @@ export default function BookingPage() {
                           border:`1.5px solid ${isActive ? ACC : '#e2e8f0'}`,
                           background: isActive ? ACC + '12' : '#fff',
                         }}>
-                          <div style={{ width:44, height:44, borderRadius:14, background: isActive ? ACC+'22' : '#f1f5f9', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>
-                            👨‍⚕️
+                          <div style={{ width:44, height:44, borderRadius:14, overflow:'hidden', flexShrink:0, border:`1.5px solid ${isActive ? ACC : '#e2e8f0'}` }}>
+                            {getDoctorPhoto(d)
+                              ? <img src={getDoctorPhoto(d)!} alt={d.first_name} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'top' }} />
+                              : <div style={{ width:'100%', height:'100%', background: isActive ? ACC+'22' : '#f1f5f9', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>👨‍⚕️</div>
+                            }
                           </div>
                           <div style={{ textAlign:'left', flex:1 }}>
                             <div style={{ fontSize:13, fontWeight:800, color:'#0f172a' }}>{fullName}</div>
@@ -603,10 +658,10 @@ export default function BookingPage() {
                   {cardTitle(BLUE, '🕐', 'Créneau horaire')}
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
                     {CRENEAUX.map(h => (
-                      <button key={h} className="chip-btn" onClick={() => set('rdv_time', h)} style={{
+                      <button key={h} className={`chip-btn${form.rdv_time === h ? '' : ' slot-shimmer'}`} onClick={() => set('rdv_time', h)} style={{
                         padding:'10px 4px', borderRadius:12, cursor:'pointer', fontSize:12, fontWeight:800, textAlign:'center',
                         border:`1.5px solid ${form.rdv_time === h ? ACC : '#e2e8f0'}`,
-                        background: form.rdv_time === h ? ACC : '#fff',
+                        background: form.rdv_time === h ? ACC : undefined,
                         color: form.rdv_time === h ? '#fff' : '#0f172a',
                       }}>
                         {h}

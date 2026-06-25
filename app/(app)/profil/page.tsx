@@ -150,7 +150,7 @@ export default function ProfilPage() {
           {/* NAV TABS */}
           <div style={{ display:'flex', gap:8, margin:'16px 0', background:'#fff', borderRadius:18, padding:6, boxShadow:'0 4px 16px rgba(0,0,0,.06)', border:'1.5px solid #e2e8f0' }}>
             {([['menu','📋 Menu'],['sante','❤️ Santé'],['urgence','🚨 Urgence']] as const).map(([k,label]) => (
-              <button key={k} onClick={() => setSection(k)} style={{ flex:1, padding:'10px 6px', borderRadius:12, border:'none', fontSize:12, fontWeight:800, cursor:'pointer', background:section===k?`linear-gradient(135deg,${ACC2},${ACC})`:'transparent', color:section===k?'#fff':'#64748b', transition:'all .2s' }}>
+              <button key={k} onClick={() => { setSection(k); setEditing(false) }} style={{ flex:1, padding:'10px 6px', borderRadius:12, border:'none', fontSize:12, fontWeight:800, cursor:'pointer', background:section===k?`linear-gradient(135deg,${ACC2},${ACC})`:'transparent', color:section===k?'#fff':'#64748b', transition:'all .2s' }}>
                 {label}
               </button>
             ))}
@@ -172,7 +172,35 @@ export default function ProfilPage() {
                     {field('last_name', 'Nom', 'Kouassi')}
                   </div>
                   {field('email', 'Email', 'konan@email.com', 'email')}
-                  {field('birth_date', 'Date de naissance', 'JJ/MM/AAAA', 'date')}
+                  <div>
+                    <label style={{ fontSize:11, fontWeight:800, color:'#64748b', textTransform:'uppercase', letterSpacing:'.8px', display:'block', marginBottom:5 }}>Date de naissance</label>
+                    <div style={{ display:'grid', gridTemplateColumns:'2fr 3fr 2fr', gap:8 }}>
+                      <select
+                        value={form.birth_date ? String(form.birth_date).split('-')[2] : ''}
+                        onChange={e => { const [y,m] = form.birth_date ? String(form.birth_date).split('-') : ['1990','01']; if(e.target.value) setForm(prev=>({...prev,birth_date:`${y||'1990'}-${m||'01'}-${e.target.value}`})) }}
+                        style={{ width:'100%', padding:'13px 10px', borderRadius:14, border:'1.5px solid #e2e8f0', fontSize:14, fontFamily:'Nunito,sans-serif', fontWeight:600, color:'#0f172a', outline:'none', background:'#f8fafc', appearance:'none' as const }}
+                      >
+                        <option value="">Jour</option>
+                        {Array.from({length:31},(_,i)=>i+1).map(d=><option key={d} value={String(d).padStart(2,'0')}>{d}</option>)}
+                      </select>
+                      <select
+                        value={form.birth_date ? String(form.birth_date).split('-')[1] : ''}
+                        onChange={e => { const [y,,d] = form.birth_date ? String(form.birth_date).split('-') : ['1990','01','01']; if(e.target.value) setForm(prev=>({...prev,birth_date:`${y||'1990'}-${e.target.value}-${d||'01'}`})) }}
+                        style={{ width:'100%', padding:'13px 8px', borderRadius:14, border:'1.5px solid #e2e8f0', fontSize:13, fontFamily:'Nunito,sans-serif', fontWeight:600, color:'#0f172a', outline:'none', background:'#f8fafc', appearance:'none' as const }}
+                      >
+                        <option value="">Mois</option>
+                        {['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'].map((m,i)=><option key={i} value={String(i+1).padStart(2,'0')}>{m}</option>)}
+                      </select>
+                      <select
+                        value={form.birth_date ? String(form.birth_date).split('-')[0] : ''}
+                        onChange={e => { const [,m,d] = form.birth_date ? String(form.birth_date).split('-') : ['1990','01','01']; if(e.target.value) setForm(prev=>({...prev,birth_date:`${e.target.value}-${m||'01'}-${d||'01'}`})) }}
+                        style={{ width:'100%', padding:'13px 8px', borderRadius:14, border:'1.5px solid #e2e8f0', fontSize:14, fontFamily:'Nunito,sans-serif', fontWeight:600, color:'#0f172a', outline:'none', background:'#f8fafc', appearance:'none' as const }}
+                      >
+                        <option value="">Année</option>
+                        {Array.from({length:100},(_,i)=>new Date().getFullYear()-i).map(y=><option key={y} value={y}>{y}</option>)}
+                      </select>
+                    </div>
+                  </div>
                   {select('gender', 'Genre', [{ value:'M', label:'Homme' }, { value:'F', label:'Femme' }])}
                   <button onClick={saveProfile} style={{ width:'100%', padding:'14px', borderRadius:16, border:'none', background:`linear-gradient(135deg,${ACC2},${ACC})`, color:'#fff', fontSize:14, fontWeight:900, cursor:'pointer', boxShadow:`0 8px 24px rgba(29,158,117,.4)` }}>
                     💾 Enregistrer
@@ -302,7 +330,7 @@ export default function ProfilPage() {
 
           <div style={{ textAlign:'center', padding:'20px 0', animation:'slideUp .4s ease .3s both' }}>
             <div style={{ fontSize:12, fontWeight:800, color:ACC }}>Oria Care</div>
-            <div style={{ fontSize:10, color:'#94a3b8', fontWeight:600, marginTop:2 }}>© 2026 ShidoOS · Côte d&apos;Ivoire</div>
+            <div style={{ fontSize:10, color:'#94a3b8', fontWeight:600, marginTop:2 }}>© 2026 Oria Care · Côte d&apos;Ivoire</div>
           </div>
         </div>
       </div>

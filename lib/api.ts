@@ -96,7 +96,7 @@ export const configApi = {
 
 export const publicAppointmentApi = {
   getDoctors: () =>
-    apiFetch<{ id: number; first_name: string; last_name: string; specialite?: string }[]>(
+    apiFetch<{ id: number; first_name: string; last_name: string; specialite?: string; img?: string }[]>(
       '/api/v1/appointments/public/doctors', { public: true }
     ),
   create: (data: {

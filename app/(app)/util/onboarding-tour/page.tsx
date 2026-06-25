@@ -5,7 +5,7 @@ const STEPS = [
   { id: 1, icon: '👤', title: 'Profil complet', description: 'Renseignez votre nom, photo et coordonnées pour un meilleur suivi médical.' },
   { id: 2, icon: '📅', title: 'Premier rendez-vous', description: 'Prenez votre premier rendez-vous avec un médecin en quelques secondes.' },
   { id: 3, icon: '🔔', title: 'Activer les notifications', description: 'Autorisez les notifications pour recevoir vos rappels de RDV et résultats.' },
-  { id: 4, icon: '📱', title: 'Télécharger l\'app', description: 'Installez ShidoConnect sur votre téléphone pour un accès hors-ligne.' },
+  { id: 4, icon: '📱', title: 'Télécharger l\'app', description: 'Installez Oria Care sur votre téléphone pour un accès hors-ligne.' },
   { id: 5, icon: '👥', title: 'Partager à un proche', description: 'Invitez un membre de votre famille à rejoindre la plateforme.' },
   { id: 6, icon: '🌐', title: 'Découvrir tous les services', description: 'Explorez téléconsultation, ordonnances, analyses et bien plus.' },
 ];

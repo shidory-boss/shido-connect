@@ -10,8 +10,8 @@ import { localAuth } from '@/lib/localAuth'
 export default function LoginPage() {
   const router = useRouter()
   const { config } = usePWAConfig()
-  const [phone, setPhone]         = useState('0600000000')
-  const [password, setPassword]   = useState('demo1234')
+  const [phone, setPhone]         = useState('')
+  const [password, setPassword]   = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName]   = useState('')
   const [error, setError]         = useState('')
@@ -216,7 +216,7 @@ export default function LoginPage() {
             </div>
 
             <h1 style={{ fontSize:26, fontWeight:900, color:'#fff', margin:'0 0 6px', letterSpacing:'-0.5px', textShadow:'0 2px 12px rgba(0,0,0,0.2)' }}>
-              {config.clinic_name || 'ShidoConnect'}
+              {config.clinic_name || 'Oria Care'}
             </h1>
             <p style={{ fontSize:14, color:'rgba(255,255,255,0.72)', margin:0, fontWeight:600 }}>
               {config.welcome_message || 'Votre espace santé personnel'}
@@ -342,7 +342,7 @@ export default function LoginPage() {
               fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.4)',
               letterSpacing:'1.5px', textTransform:'uppercase',
             }}>
-              Propulsé par ShidoOS
+              Propulsé par Oria Care
             </div>
           </div>
         </div>

@@ -10,11 +10,20 @@ const CRENEAUX = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30
 
 type Doctor = { id: number; first_name: string; last_name: string; specialite?: string; img?: string }
 
+const DOCTOR_PHOTOS: Record<string, string> = {
+  'Yanick':  '/images/Docteurs/Docteur africain 600x800.png',
+  'Franck':  '/images/Docteurs/Docteur africain final 600x800.png',
+  'Christy': '/images/Docteurs/Femme docteur 600x800 final.png',
+  'Jean':    '/images/Docteurs/Docteur africain final 600x800.png',
+}
+
 const FALLBACK_DOCTORS: Doctor[] = [
-  { id: 1, first_name: 'Yanick', last_name: 'Oulaï',   specialite: 'Médecine générale',  img: '/images/Docteurs/Docteur africain 600x800.png' },
-  { id: 2, first_name: 'Franck', last_name: 'Kouamé',  specialite: 'Médecine interne',   img: '/images/Docteurs/Docteur africain final 600x800.png' },
-  { id: 3, first_name: 'Christy', last_name: 'Onamon', specialite: 'Médecine générale',  img: '/images/Docteurs/Femme docteur 600x800 final.png' },
+  { id: 1, first_name: 'Yanick', last_name: 'Oulaï',   specialite: 'Médecine générale',  img: DOCTOR_PHOTOS['Yanick'] },
+  { id: 2, first_name: 'Franck', last_name: 'Kouamé',  specialite: 'Médecine interne',   img: DOCTOR_PHOTOS['Franck'] },
+  { id: 3, first_name: 'Christy', last_name: 'Onamon', specialite: 'Médecine générale',  img: DOCTOR_PHOTOS['Christy'] },
 ]
+
+const getPhoto = (d: Doctor) => d.img || DOCTOR_PHOTOS[d.first_name]
 
 export default function TeleconsultPage() {
   const router = useRouter()
@@ -51,11 +60,16 @@ export default function TeleconsultPage() {
       <style>{`
         @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
         @keyframes pulseDot { 0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.6)} 50%{box-shadow:0 0 0 8px rgba(74,222,128,0)} }
-        @keyframes ctaglow { from{box-shadow:0 8px 24px rgba(29,158,117,.5)} to{box-shadow:0 8px 40px rgba(29,158,117,.8)} }
+        @keyframes ctaglow   { from{box-shadow:0 8px 24px rgba(29,158,117,.5)} to{box-shadow:0 8px 40px rgba(29,158,117,.8)} }
+        @keyframes floatBadge{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+        @keyframes docGlow   { 0%,100%{box-shadow:0 4px 16px rgba(29,158,117,.1)} 50%{box-shadow:0 4px 28px rgba(29,158,117,.35),0 0 0 2px rgba(29,158,117,.15)} }
+        @keyframes slotShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+        @keyframes floatBtn  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
         .doc-card { cursor:pointer; transition:all .2s cubic-bezier(.34,1.56,.64,1); }
         .doc-card:active { transform:scale(.97); }
         .slot-btn { cursor:pointer; transition:all .18s; }
         .slot-btn:active { transform:scale(.93); }
+        .slot-available { background:linear-gradient(90deg,#f8fafc 0%,rgba(255,255,255,.85) 40%,#e8f9f3 60%,#f8fafc 100%) 200% center / 300% auto; animation:slotShimmer 3.2s linear infinite; }
       `}</style>
 
       <div style={{ minHeight:'100vh', background:'#f0faf6', fontFamily:'Nunito,system-ui,sans-serif', paddingBottom:100 }}>
@@ -72,7 +86,7 @@ export default function TeleconsultPage() {
             <div style={{ fontSize:11, fontWeight:800, color:'#a8edda', letterSpacing:'2px', textTransform:'uppercase', marginBottom:4 }}>Service médical</div>
             <div style={{ fontSize:24, fontWeight:900, color:'#fff', lineHeight:1.2, marginBottom:10 }}>Téléconsultation</div>
             <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-              <div style={{ background:'rgba(255,255,255,.15)', backdropFilter:'blur(10px)', borderRadius:10, padding:'6px 12px', display:'flex', alignItems:'center', gap:6 }}>
+              <div style={{ background:'rgba(255,255,255,.15)', backdropFilter:'blur(10px)', borderRadius:10, padding:'6px 12px', display:'flex', alignItems:'center', gap:6, animation:'floatBadge 3s ease-in-out infinite' }}>
                 <span style={{ width:8,height:8,borderRadius:'50%',background:'#4ade80',display:'inline-block',animation:'pulseDot 1.5s ease-in-out infinite' }}/>
                 <span style={{ color:'#fff', fontSize:11, fontWeight:800 }}>Connexion sécurisée · Vidéo HD</span>
               </div>
@@ -101,10 +115,11 @@ export default function TeleconsultPage() {
                       display:'flex', alignItems:'center', gap:14, padding:'14px 16px', borderRadius:16,
                       border:`1.5px solid ${isActive ? ACC : '#e2e8f0'}`,
                       background: isActive ? ACC+'0e' : '#f8fafc',
+                      animation:`docGlow 3s ease-in-out ${FALLBACK_DOCTORS.indexOf(d) * 0.7}s infinite`,
                     }}>
                       <div style={{ width:56,height:56,borderRadius:16,overflow:'hidden',flexShrink:0,position:'relative',border:`2px solid ${isActive ? ACC : '#e2e8f0'}` }}>
-                        {d.img
-                          ? <img src={d.img} alt={d.first_name} style={{ width:'100%',height:'100%',objectFit:'cover',objectPosition:'top' }} />
+                        {getPhoto(d)
+                          ? <img src={getPhoto(d)!} alt={d.first_name} style={{ width:'100%',height:'100%',objectFit:'cover',objectPosition:'top' }} />
                           : <div style={{ width:'100%',height:'100%',background:isActive?ACC+'22':'#e2e8f0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:24 }}>👨‍⚕️</div>
                         }
                         <span style={{ position:'absolute',bottom:2,right:2,width:11,height:11,borderRadius:'50%',background:'#4ade80',border:'2px solid #fff',animation:'pulseDot 1.5s ease-in-out infinite' }}/>
@@ -167,10 +182,10 @@ export default function TeleconsultPage() {
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8 }}>
                 {CRENEAUX.map(h => (
-                  <button key={h} className="slot-btn" onClick={() => setSelectedSlot(h)} style={{
+                  <button key={h} className={`slot-btn${selectedSlot===h ? '' : ' slot-available'}`} onClick={() => setSelectedSlot(h)} style={{
                     padding:'11px 4px', borderRadius:12, cursor:'pointer', fontSize:13, fontWeight:800, textAlign:'center',
                     border:`1.5px solid ${selectedSlot===h ? '#8B5CF6' : '#e2e8f0'}`,
-                    background: selectedSlot===h ? '#8B5CF6' : '#f8fafc',
+                    background: selectedSlot===h ? '#8B5CF6' : undefined,
                     color: selectedSlot===h ? '#fff' : '#475569',
                   }}>
                     {h}
@@ -205,7 +220,7 @@ export default function TeleconsultPage() {
               border:'none', borderRadius:18, fontSize:15, fontWeight:900,
               color:'#fff', cursor:'pointer',
               boxShadow:`0 10px 32px rgba(29,158,117,.45)`,
-              animation:'ctaglow 2s ease-in-out infinite alternate',
+              animation:'ctaglow 2s ease-in-out infinite alternate, floatBtn 3s ease-in-out infinite',
             }}>
               🎥 Démarrer la téléconsultation →
             </button>

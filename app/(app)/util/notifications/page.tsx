@@ -28,7 +28,7 @@ export default function NotificationsPage() {
 
   function sendTestNotification() {
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      new Notification('Test ShidoConnect', { body: 'Vos notifications fonctionnent !' })
+      new Notification('Test Oria Care', { body: 'Vos notifications fonctionnent !' })
     }
   }
 
