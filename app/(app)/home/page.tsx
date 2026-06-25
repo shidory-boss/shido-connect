@@ -18,14 +18,14 @@ const CLIENT_IMGS = [
 ]
 
 const SERVICES = [
-  { icon:'🩺', label:'Consultation Générale',  color:'#1D9E75', dark:'#0F6E56' },
-  { icon:'🧪', label:'Analyses & Bilans',       color:'#0B1D35', dark:'#060F1C' },
-  { icon:'🩻', label:'Radiologie & Imagerie',   color:'#1D9E75', dark:'#0F6E56' },
-  { icon:'👶', label:'Pédiatrie',               color:'#0B1D35', dark:'#060F1C' },
-  { icon:'❤️', label:'Cardiologie',             color:'#1D9E75', dark:'#0F6E56' },
-  { icon:'🎥', label:'Téléconsultation',         color:'#0B1D35', dark:'#060F1C' },
-  { icon:'🏥', label:'Hospitalisation',          color:'#1D9E75', dark:'#0F6E56' },
-  { icon:'🚑', label:'Urgences 24h/24',         color:'#0B1D35', dark:'#060F1C' },
+  { icon:'🩺', label:'Consultation Générale', slug:'consultation-generale', img:'/images/Services/General Consultation mint green 800x800.png',            color:'#1D9E75', dark:'#0F6E56' },
+  { icon:'🧪', label:'Analyses & Bilans',      slug:'analyses-bilans',       img:'/images/Services/Analyses and Reports 800x800 style reference.png',       color:'#0B1D35', dark:'#060F1C' },
+  { icon:'🩻', label:'Radiologie & Imagerie',  slug:'radiologie-imagerie',   img:'/images/Services/Radiologie et Imagerie 800x800 style reference.png',     color:'#1D9E75', dark:'#0F6E56' },
+  { icon:'👶', label:'Pédiatrie',              slug:'pediatrie',             img:'/images/Services/Pediatrie 800x800 style reference.png',                  color:'#0B1D35', dark:'#060F1C' },
+  { icon:'❤️', label:'Cardiologie',            slug:'cardiologie',           img:'/images/Services/Cardiologie 800x800 style reference.png',                color:'#1D9E75', dark:'#0F6E56' },
+  { icon:'🎥', label:'Téléconsultation',        slug:'teleconsultation',      img:'/images/Services/Teleconsultation 800x800 style reference.png',           color:'#0B1D35', dark:'#060F1C' },
+  { icon:'🏥', label:'Hospitalisation',         slug:'hospitalisation',       img:'/images/Services/Hospitalisation 800x800 style reference.png',            color:'#1D9E75', dark:'#0F6E56' },
+  { icon:'🚑', label:'Urgences 24h/24',        slug:'urgences',              img:'/images/Services/24-7 Emergency Room 800x800 style reference.png',        color:'#0B1D35', dark:'#060F1C' },
 ]
 
 const TEAM = [
@@ -205,15 +205,14 @@ export default function HomePage() {
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
             {SERVICES.map((s, i) => (
-              <Link key={i} href="/vitrine/services" style={{ textDecoration:'none' }}>
-                <div className="svc-card" style={{ background:'#fff', borderRadius:20, overflow:'hidden', boxShadow:'0 4px 18px rgba(0,0,0,.08)', border:`1px solid ${s.color}18`, animation:`scaleIn .4s ease ${i*0.05+0.2}s both` }}>
-                  <div style={{ background:`linear-gradient(135deg,${s.dark},${s.color})`, padding:'20px 16px 14px', position:'relative', overflow:'hidden' }}>
-                    <div style={{ position:'absolute', top:'-20px', right:'-20px', width:80, height:80, borderRadius:'50%', background:'rgba(255,255,255,.12)' }} />
-                    <div style={{ fontSize:32, position:'relative', zIndex:1 }}>{s.icon}</div>
-                  </div>
-                  <div style={{ padding:'12px 14px' }}>
-                    <div style={{ fontSize:12, fontWeight:900, color:'#0f172a', lineHeight:1.3 }}>{s.label}</div>
-                    <div style={{ fontSize:10, color:s.color, fontWeight:800, marginTop:6 }}>En savoir plus →</div>
+              <Link key={i} href={`/services/${s.slug}`} style={{ textDecoration:'none' }}>
+                <div className="svc-card" style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 4px 18px rgba(0,0,0,.12)', animation:`scaleIn .4s ease ${i*0.05+0.2}s both`, position:'relative', height:160 }}>
+                  <img src={s.img} alt={s.label} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', display:'block' }} />
+                  <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,transparent 20%,${s.dark}DD 100%)` }} />
+                  <div style={{ position:'absolute', top:10, left:10, width:34, height:34, borderRadius:10, background:'rgba(255,255,255,.2)', backdropFilter:'blur(8px)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}>{s.icon}</div>
+                  <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 12px' }}>
+                    <div style={{ fontSize:11, fontWeight:900, color:'#fff', lineHeight:1.3 }}>{s.label}</div>
+                    <div style={{ fontSize:10, color:s.color === '#1D9E75' ? '#a8edda' : 'rgba(255,255,255,.7)', fontWeight:800, marginTop:3 }}>Voir →</div>
                   </div>
                 </div>
               </Link>
