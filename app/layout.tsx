@@ -1,40 +1,38 @@
-import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
-import { clinicConfig } from "@/lib/config";
-import "./globals.css";
-
-const geist = Geist({ subsets: ["latin"] });
+import type { Metadata, Viewport } from 'next'
+import './globals.css'
+import { PWAConfigProvider } from '@/core/PWAConfigContext'
 
 export const metadata: Metadata = {
-  title:       `${clinicConfig.name} — Votre Clinique`,
-  description: clinicConfig.description,
-  manifest:    "/manifest.json",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: clinicConfig.shortName },
-  openGraph: {
-    title:       clinicConfig.name,
-    description: clinicConfig.tagline,
-    type:        "website",
-  },
-};
+  title: 'ShidoConnect',
+  description: 'Votre espace santé personnalisé',
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'ShidoConnect' },
+}
 
 export const viewport: Viewport = {
-  themeColor:   clinicConfig.accent,
-  width:        "device-width",
+  width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-};
+  userScalable: false,
+  themeColor: '#1D9E75',
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={geist.className}>
+    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('sc_theme')||'light';if(t==='auto'){t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);var a=localStorage.getItem('sc_accent');if(a)document.documentElement.style.setProperty('--accent',a);}catch(e){}})();` }} />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
       </head>
-      <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        {children}
+      <body>
+        <PWAConfigProvider>
+          {children}
+        </PWAConfigProvider>
       </body>
     </html>
-  );
+  )
 }
