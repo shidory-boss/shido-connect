@@ -50,7 +50,13 @@ if (!isDev) {
     dest: 'public',
     register: true,
     skipWaiting: true,
+    clientsClaim: true,
     disable: false,
+    // Force tous les clients à recharger immédiatement après mise à jour SW
+    workboxOptions: {
+      skipWaiting: true,
+      clientsClaim: true,
+    },
   });
   finalConfig = withPWA(finalConfig);
 }
