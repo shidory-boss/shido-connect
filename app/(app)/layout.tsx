@@ -15,6 +15,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  // Transition jour/nuit douce — palette change selon l'heure
+  useEffect(() => {
+    const applyTimeTheme = () => {
+      const h = new Date().getHours()
+      const isNight = h >= 19 || h < 6
+      const isSunset = h === 18
+      let accent = '#1D9E75'
+      let bg = '#f0faf6'
+      if (isNight)       { accent = '#0F6E56'; bg = '#0a1628' }
+      else if (isSunset) { accent = '#16835f'; bg = '#0f2a1e' }
+      document.documentElement.style.setProperty('--accent', accent)
+      document.documentElement.style.setProperty('--bg-app', bg)
+      document.documentElement.style.setProperty('--transition', 'background-color 1.8s ease, color 1.8s ease')
+    }
+    applyTimeTheme()
+    const t = setInterval(applyTimeTheme, 60_000)
+    return () => clearInterval(t)
+  }, [])
+
   return (
     <div className="app-outer">
       <div className="app-shell">

@@ -135,15 +135,31 @@ export default function RecordsPage() {
 
   const displayMetrics = isLoggedIn ? metrics : DEMO_METRICS
 
+  const GAUGE_MAX: Record<string, number> = { bpm:220, 'mg/dL':300, kg:200, '°C':42 }
   const metricCard = (icon: string, bg: string, label: string, val: string, unit: string) => {
     const empty = !val
+    const numVal = parseFloat(val) || 0
+    const max = GAUGE_MAX[unit] || 100
+    const pct = Math.min((numVal / max) * 100, 100)
     return (
       <div style={{ background:bg, borderRadius:18, padding:'16px', border:'1.5px solid rgba(0,0,0,.05)', opacity:empty && isLoggedIn ? .5 : 1 }}>
         <div style={{ fontSize:24, marginBottom:8 }}>{icon}</div>
         <div style={{ fontSize:11, color:'#64748b', fontWeight:700, marginBottom:4 }}>{label}</div>
-        <div style={{ fontSize:20, fontWeight:900, color:'#0f172a' }}>
+        <div style={{ fontSize:20, fontWeight:900, color:'#0f172a', animation:'countUp .6s ease both' }}>
           {empty && isLoggedIn ? <span style={{fontSize:12,color:'#94a3b8'}}>—</span> : <>{val}<span style={{fontSize:11,fontWeight:600,color:'#94a3b8',marginLeft:2}}>{unit}</span></>}
         </div>
+        {!empty && (
+          <div style={{ marginTop:8, height:4, borderRadius:4, background:'rgba(0,0,0,.08)', overflow:'hidden' }}>
+            <div style={{
+              height:'100%', borderRadius:4,
+              background:`linear-gradient(90deg,${ACC2},${ACC})`,
+              // @ts-expect-error css var
+              '--gauge-w': `${pct}%`,
+              animation:'gaugeUp .9s cubic-bezier(.34,1.56,.64,1) .2s both',
+              width:`${pct}%`,
+            }} />
+          </div>
+        )}
       </div>
     )
   }
@@ -161,8 +177,11 @@ export default function RecordsPage() {
       <style>{`
         @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
         @keyframes floatBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        @keyframes toastIn { from{opacity:0;transform:translateY(20px) scale(.95)} to{opacity:1;transform:none} }
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes toastIn    { from{opacity:0;transform:translateY(20px) scale(.95)} to{opacity:1;transform:none} }
+        @keyframes toastBounce{ 0%{opacity:0;transform:translateX(-50%) translateY(-28px) scale(.85)} 60%{transform:translateX(-50%) translateY(6px) scale(1.04)} 80%{transform:translateX(-50%) translateY(-3px) scale(.98)} 100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} }
+        @keyframes fadeIn     { from{opacity:0} to{opacity:1} }
+        @keyframes gaugeUp    { from{width:0%} to{width:var(--gauge-w)} }
+        @keyframes countUp    { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
         .doc-row { transition:all .2s; }
         .doc-row:active { transform:scale(.98); }
         input:focus { border-color:${ACC}!important; box-shadow:0 0 0 3px rgba(29,158,117,.12)!important; }
@@ -171,7 +190,7 @@ export default function RecordsPage() {
       <div style={{ minHeight:'100vh', background:'#f0faf6', fontFamily:'Nunito,system-ui,sans-serif', paddingBottom:80 }}>
 
         {toast && (
-          <div style={{ position:'fixed', bottom:100, left:'50%', transform:'translateX(-50%)', background:'#0f172a', color:'#fff', padding:'12px 24px', borderRadius:20, fontSize:13, fontWeight:700, zIndex:9999, animation:'toastIn .3s ease', whiteSpace:'nowrap', boxShadow:'0 8px 24px rgba(0,0,0,.25)' }}>
+          <div style={{ position:'fixed', top:24, left:'50%', background:'#0f172a', color:'#fff', padding:'12px 24px', borderRadius:20, fontSize:13, fontWeight:700, zIndex:9999, animation:'toastBounce .5s cubic-bezier(.34,1.56,.64,1) both', whiteSpace:'nowrap', boxShadow:'0 8px 24px rgba(0,0,0,.25)' }}>
             {toast}
           </div>
         )}

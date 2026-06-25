@@ -49,6 +49,11 @@ export default function SplashPage() {
           0%,100% { transform:translateY(0); }
           50%      { transform:translateY(-12px); }
         }
+        @keyframes ecgSplash {
+          0%   { stroke-dashoffset:500; opacity:.7; }
+          70%  { stroke-dashoffset:0;   opacity:.7; }
+          100% { stroke-dashoffset:0;   opacity:0; }
+        }
       `}</style>
 
       <div style={{
@@ -120,9 +125,17 @@ export default function SplashPage() {
           </div>
         </div>
 
+        {/* ECG Splash */}
+        <svg viewBox="0 0 320 40" style={{ width:280, marginTop:28, opacity:.6 }}>
+          <polyline points="0,20 30,20 45,20 55,4 65,36 75,8 85,20 110,20 130,20 145,20 155,5 165,35 175,9 185,20 210,20 250,20 265,20 275,5 285,35 295,9 305,20 320,20"
+            fill="none" stroke="#a8edda" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+            strokeDasharray="500"
+            style={{ animation:'ecgSplash 2.2s ease 0.6s both' }} />
+        </svg>
+
         {/* Tagline */}
         <div style={{
-          marginTop:46, color:'rgba(255,255,255,.75)', fontSize:15, fontWeight:600,
+          marginTop:20, color:'rgba(255,255,255,.75)', fontSize:15, fontWeight:600,
           animation: anim !== 'in' ? 'fadeUp .9s ease 1.1s both' : 'none',
         }}>
           Votre Santé, Notre Priorité 💚

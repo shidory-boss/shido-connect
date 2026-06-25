@@ -114,7 +114,8 @@ export default function ProfilPage() {
         @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
         @keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
         @keyframes glow { 0%,100%{box-shadow:0 0 0 0 rgba(29,158,117,.4)} 50%{box-shadow:0 0 0 12px rgba(29,158,117,0)} }
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+        @keyframes toastBounce { 0%{opacity:0;transform:translateX(-50%) translateY(-28px) scale(.85)} 60%{transform:translateX(-50%) translateY(6px) scale(1.04)} 80%{transform:translateX(-50%) translateY(-3px) scale(.98)} 100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} }
         .menu-item { cursor:pointer; transition:all .2s; }
         .menu-item:active { transform:scale(.97) translateX(3px); }
         input:focus, select:focus { border-color:${ACC}!important; box-shadow:0 0 0 3px rgba(29,158,117,.12)!important; }
@@ -139,7 +140,7 @@ export default function ProfilPage() {
 
         {/* TOAST */}
         {saved && (
-          <div style={{ position:'fixed',top:20,left:'50%',transform:'translateX(-50%)',background:ACC,color:'#fff',padding:'12px 24px',borderRadius:16,fontSize:13,fontWeight:800,zIndex:9999,boxShadow:'0 8px 32px rgba(29,158,117,.4)',animation:'fadeIn .3s ease' }}>
+          <div style={{ position:'fixed',top:20,left:'50%',background:ACC,color:'#fff',padding:'12px 24px',borderRadius:16,fontSize:13,fontWeight:800,zIndex:9999,boxShadow:'0 8px 32px rgba(29,158,117,.5)',animation:'toastBounce .5s cubic-bezier(.34,1.56,.64,1) both',whiteSpace:'nowrap' }}>
             ✓ Profil mis à jour
           </div>
         )}

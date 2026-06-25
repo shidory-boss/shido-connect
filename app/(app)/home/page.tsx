@@ -142,6 +142,11 @@ export default function HomePage() {
         @keyframes shimmerTxt { 0%{background-position:200% center} 100%{background-position:-200% center} }
         @keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
         @keyframes scaleIn    { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
+        @keyframes ecgDraw    { from{stroke-dashoffset:900} to{stroke-dashoffset:0} }
+        @keyframes ecgFade    { 0%,85%{opacity:.55} 100%{opacity:0} }
+        @keyframes ripple     { from{transform:scale(0);opacity:.5} to{transform:scale(3);opacity:0} }
+        .svc-card:active { transform:scale(.96) rotate(-1deg)!important; }
+        .rdv-btn:active  { transform:scale(.96)!important; }
         @keyframes slideRight { from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:none} }
         @keyframes pulse      { 0%,100%{box-shadow:0 0 0 0 rgba(29,158,117,.45)} 70%{box-shadow:0 0 0 12px rgba(29,158,117,0)} }
         @keyframes slideUp    { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
@@ -180,6 +185,13 @@ export default function HomePage() {
               <Link href="/login" style={{ padding:'8px 16px', borderRadius:20, background:'rgba(255,255,255,.9)', color:acc2, fontSize:12, fontWeight:900, textDecoration:'none', boxShadow:'0 4px 16px rgba(0,0,0,.15)' }}>Connexion</Link>
             )}
           </div>
+
+          {/* ECG LINE */}
+          <svg viewBox="0 0 400 60" preserveAspectRatio="none" style={{ position:'absolute', bottom:80, left:0, right:0, width:'100%', height:60, zIndex:1, opacity:.35, pointerEvents:'none' }}>
+            <polyline points="0,30 40,30 55,30 65,5 75,55 85,10 95,30 120,30 140,30 155,30 165,8 175,52 185,12 195,30 220,30 260,30 275,30 285,7 295,53 305,11 315,30 340,30 400,30"
+              fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              strokeDasharray="900" style={{ animation:'ecgDraw 3s linear infinite, ecgFade 3s linear infinite' }} />
+          </svg>
 
           {/* Contenu hero */}
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'0 22px 32px', zIndex:2 }}>
@@ -247,7 +259,17 @@ export default function HomePage() {
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
             {SERVICES.map((s, i) => (
               <Link key={i} href={`/services/${s.slug}`} style={{ textDecoration:'none' }}>
-                <div className="svc-card" style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 4px 18px rgba(0,0,0,.12)', animation:`scaleIn .4s ease ${i*0.05+0.2}s both`, position:'relative', height:160 }}>
+                <div className="svc-card" style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 4px 18px rgba(0,0,0,.12)', animation:`scaleIn .4s ease ${i*0.05+0.2}s both`, position:'relative', height:160 }}
+                  onTouchStart={e => {
+                    const el = e.currentTarget
+                    const rect = el.getBoundingClientRect()
+                    const x = e.touches[0].clientX - rect.left
+                    const y = e.touches[0].clientY - rect.top
+                    const rip = document.createElement('span')
+                    rip.style.cssText = `position:absolute;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.35);left:${x-20}px;top:${y-20}px;animation:ripple .6s ease forwards;pointer-events:none;z-index:10`
+                    el.appendChild(rip)
+                    setTimeout(() => rip.remove(), 600)
+                  }}>
                   <img src={s.img} alt={s.label} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', display:'block' }} />
                   <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,transparent 20%,${s.dark}DD 100%)` }} />
                   <div style={{ position:'absolute', top:10, left:10, width:34, height:34, borderRadius:10, background:'rgba(255,255,255,.2)', backdropFilter:'blur(8px)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}>{s.icon}</div>

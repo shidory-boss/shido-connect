@@ -20,6 +20,19 @@ export default function LoginPage() {
   const [focused, setFocused]     = useState<string | null>(null)
   const [showPass, setShowPass]   = useState(false)
   const [mounted, setMounted]     = useState(false)
+  const [particles, setParticles] = useState<{ id:number; x:number; y:number; color:string }[]>([])
+
+  const burstParticles = () => {
+    const colors = ['#4ade80','#a8edda','#fff','#1D9E75','#86efac']
+    const pts = Array.from({ length: 18 }, (_, i) => ({
+      id: Date.now() + i,
+      x: 40 + Math.random() * 20,
+      y: 40 + Math.random() * 20,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    }))
+    setParticles(pts)
+    setTimeout(() => setParticles([]), 900)
+  }
 
   const acc  = config.primary_color   || '#1D9E75'
   const acc2 = config.secondary_color || '#0F6E56'
@@ -35,7 +48,7 @@ export default function LoginPage() {
       const res = await authApi.login(phone, password)
       storage.setToken(res.access_token)
       storage.setPatient(res.patient)
-      router.replace('/home')
+      burstParticles(); setTimeout(() => router.replace('/home'), 700)
     } catch {
       // Backend indisponible → auth locale
       try {
@@ -44,7 +57,7 @@ export default function LoginPage() {
         storage.setToken(token)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         storage.setPatient(patient as any)
-        router.replace('/home')
+        burstParticles(); setTimeout(() => router.replace('/home'), 700)
       } catch (localErr: unknown) {
         setError(localErr instanceof Error ? localErr.message : 'Identifiants incorrects')
       }
@@ -60,7 +73,7 @@ export default function LoginPage() {
       const res = await authApi.register({ first_name: firstName, last_name: lastName, phone, password })
       storage.setToken(res.access_token)
       storage.setPatient(res.patient)
-      router.replace('/home')
+      burstParticles(); setTimeout(() => router.replace('/home'), 800)
     } catch {
       // Backend indisponible → crée un compte local
       try {
@@ -69,7 +82,7 @@ export default function LoginPage() {
         storage.setToken(token)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         storage.setPatient(patient as any)
-        router.replace('/home')
+        burstParticles(); setTimeout(() => router.replace('/home'), 800)
       } catch (localErr: unknown) {
         setError(localErr instanceof Error ? localErr.message : "Erreur lors de la création du compte")
       }
@@ -126,6 +139,14 @@ export default function LoginPage() {
         @keyframes luxSpin {
           from { transform: rotate(0deg); }
           to   { transform: rotate(360deg); }
+        }
+        @keyframes particleBurst {
+          0%   { transform:translate(0,0) scale(1); opacity:1; }
+          100% { transform:translate(var(--tx),var(--ty)) scale(0); opacity:0; }
+        }
+        @keyframes successPulse {
+          0%,100% { box-shadow:0 8px 32px rgba(74,222,128,.4); }
+          50%      { box-shadow:0 8px 64px rgba(74,222,128,.9); }
         }
         .lux-login-input::placeholder { color: rgba(255,255,255,0.45); }
         .lux-tab { transition: all .25s ease; cursor: pointer; }
@@ -296,6 +317,24 @@ export default function LoginPage() {
               }
             </button>
           </form>
+
+          {/* Particules succès */}
+          {particles.map((p, i) => {
+            const angle = (i / particles.length) * 360
+            const dist = 60 + Math.random() * 80
+            const tx = Math.cos(angle * Math.PI / 180) * dist
+            const ty = Math.sin(angle * Math.PI / 180) * dist
+            return (
+              <div key={p.id} style={{
+                position:'absolute', left:`${p.x}%`, top:`${p.y}%`,
+                width:8, height:8, borderRadius:'50%', background:p.color,
+                // @ts-expect-error css vars
+                '--tx': `${tx}px`, '--ty': `${ty}px`,
+                animation:'particleBurst .8s ease-out forwards',
+                pointerEvents:'none', zIndex:999,
+              }} />
+            )
+          })}
 
           {/* Footer */}
           <div style={{ textAlign:'center', marginTop:24, paddingTop:20, borderTop:'1px solid rgba(255,255,255,0.15)' }}>
