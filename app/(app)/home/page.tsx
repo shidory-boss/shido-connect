@@ -29,9 +29,9 @@ const SERVICES = [
 ]
 
 const TEAM = [
-  { name:'Dr. Koné Aboubakar',  role:'Directeur Médical',        img: TEAM_IMGS[0], quote:'"La confiance et l\'écoute sont au cœur de notre engagement envers chaque patient."' },
-  { name:'Dr. Coulibaly Fatou', role:'Médecin Spécialiste',       img: TEAM_IMGS[1], quote:'"Notre équipe s\'engage à offrir des soins de pointe dans un environnement chaleureux."' },
-  { name:'Dr. Traoré Aminata',  role:'Pédiatre & Obstétricienne', img: TEAM_IMGS[2], quote:'"Chaque enfant mérite les meilleurs soins. C\'est notre mission quotidienne."' },
+  { name:'Dr. Yanick Oulaï',   role:'Directeur Médical',        img: TEAM_IMGS[0], quote:'"La confiance et l\'écoute sont au cœur de notre engagement envers chaque patient."' },
+  { name:'Dr. Franck Kouamé',  role:'Médecin Spécialiste',       img: TEAM_IMGS[1], quote:'"Notre équipe s\'engage à offrir des soins de pointe dans un environnement chaleureux."' },
+  { name:'Dr. Christy Onamon', role:'Pédiatre & Obstétricienne', img: TEAM_IMGS[2], quote:'"Chaque enfant mérite les meilleurs soins. C\'est notre mission quotidienne."' },
 ]
 
 const TESTIMONIALS = [
@@ -42,10 +42,10 @@ const TESTIMONIALS = [
 ]
 
 const STATS = [
-  { value:'98%', label:'Satisfaction patients' },
-  { value:'12+', label:'Médecins spécialistes' },
-  { value:'5k+', label:'Patients traités' },
-  { value:'15+', label:'Années d\'expérience' },
+  { target:98,   suffix:'%', label:'Satisfaction patients' },
+  { target:12,   suffix:'+', label:'Médecins spécialistes' },
+  { target:5000, suffix:'k+', label:'Patients traités', display:(n:number) => n>=1000?`${Math.floor(n/1000)}k+`:`${n}` },
+  { target:15,   suffix:'+', label:'Années d\'expérience' },
 ]
 
 const QUICK_ACTIONS = [
@@ -54,6 +54,55 @@ const QUICK_ACTIONS = [
   { href:'/teleconsult',icon:'🎥', label:'Téléconsult',     color:'#8B5CF6' },
   { href:'/reminders',  icon:'💊', label:'Rappels médocs',  color:'#F59E0B' },
 ]
+
+function StatsSection({ acc }: { acc: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [counts, setCounts] = useState(STATS.map(() => 0))
+  const started = useRef(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started.current) {
+        started.current = true
+        STATS.forEach((s, i) => {
+          const duration = 1600
+          const steps = 60
+          const interval = duration / steps
+          let step = 0
+          const timer = setInterval(() => {
+            step++
+            const progress = 1 - Math.pow(1 - step / steps, 3) // easeOutCubic
+            setCounts(prev => {
+              const next = [...prev]
+              next[i] = Math.round(s.target * progress)
+              return next
+            })
+            if (step >= steps) clearInterval(timer)
+          }, interval)
+        })
+      }
+    }, { threshold: 0.4 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  return (
+    <div ref={ref} style={{ margin:'16px 16px 0', background:'linear-gradient(135deg,#0B1D35,#122848)', borderRadius:24, padding:'20px 16px', boxShadow:'0 12px 40px rgba(11,29,53,.4)', display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:16, position:'relative', overflow:'hidden' }}>
+      <div style={{ position:'absolute', top:'-20px', right:'-20px', width:120, height:120, borderRadius:'50%', background:'rgba(29,158,117,.12)' }} />
+      {STATS.map((s, i) => {
+        const display = s.display ? s.display(counts[i]) : `${counts[i]}${s.suffix}`
+        return (
+          <div key={i} style={{ textAlign:'center', position:'relative', zIndex:1 }}>
+            <div style={{ fontSize:24, fontWeight:900, color:acc, letterSpacing:'-0.5px', transition:'color .2s' }}>{display}</div>
+            <div style={{ fontSize:11, color:'rgba(255,255,255,.6)', fontWeight:700, marginTop:3 }}>{s.label}</div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function HomePage() {
   const { config } = useClinicConfig()
@@ -186,15 +235,7 @@ export default function HomePage() {
         </div>
 
         {/* ══ STATS ══ */}
-        <div style={{ margin:'16px 16px 0', background:'linear-gradient(135deg,#0B1D35,#122848)', borderRadius:24, padding:'20px 16px', boxShadow:'0 12px 40px rgba(11,29,53,.4)', display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:16, position:'relative', overflow:'hidden', animation:'scaleIn .5s ease .5s both' }}>
-          <div style={{ position:'absolute', top:'-20px', right:'-20px', width:120, height:120, borderRadius:'50%', background:'rgba(29,158,117,.12)' }} />
-          {STATS.map((s, i) => (
-            <div key={i} style={{ textAlign:'center', position:'relative', zIndex:1 }}>
-              <div style={{ fontSize:24, fontWeight:900, color:acc, letterSpacing:'-0.5px' }}>{s.value}</div>
-              <div style={{ fontSize:11, color:'rgba(255,255,255,.6)', fontWeight:700, marginTop:3 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
+        <StatsSection acc={acc} />
 
         {/* ══ NOS SERVICES ══ */}
         <div style={{ padding:'36px 20px 0' }}>
