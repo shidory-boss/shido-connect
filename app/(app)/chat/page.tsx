@@ -80,12 +80,18 @@ export default function ChatPage() {
 
       <div style={{ minHeight:'100vh', background:'#f8fafc', fontFamily:'Nunito,system-ui,sans-serif', paddingBottom:100 }}>
 
-        {/* HEADER */}
-        <div style={{ background:`linear-gradient(160deg,${ACC2},${ACC})`, padding:'52px 20px 20px', position:'sticky', top:0, zIndex:100 }}>
-          <div style={{ fontSize:22, fontWeight:900, color:'#fff', marginBottom:14, letterSpacing:'-0.5px' }}>Messages</div>
-          <div style={{ background:'rgba(255,255,255,0.15)', backdropFilter:'blur(10px)', borderRadius:20, padding:'10px 16px', display:'flex', alignItems:'center', gap:10, border:'1px solid rgba(255,255,255,0.25)' }}>
-            <span style={{ fontSize:16, opacity:.7 }}>🔍</span>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher une conversation…" style={{ flex:1, background:'none', border:'none', outline:'none', fontSize:14, color:'#fff', fontFamily:'Nunito,system-ui,sans-serif', fontWeight:600 }} />
+        {/* HERO */}
+        <div style={{ position:'relative', height:220, overflow:'hidden' }}>
+          <img src="/images/Hero message.png" alt="Messages" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
+          <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,rgba(6,15,28,.88) 0%,rgba(11,29,53,.7) 45%,${ACC2}CC 100%)` }} />
+          <div style={{ position:'absolute', top:'-30px', right:'-30px', width:160, height:160, borderRadius:'50%', background:`${ACC}22`, pointerEvents:'none' }} />
+          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'0 20px 16px' }}>
+            <div style={{ fontSize:11, fontWeight:800, color:'#a8edda', letterSpacing:'2px', textTransform:'uppercase', marginBottom:4 }}>Messagerie sécurisée</div>
+            <div style={{ fontSize:24, fontWeight:900, color:'#fff', lineHeight:1.2, marginBottom:12 }}>Messages</div>
+            <div style={{ background:'rgba(255,255,255,0.15)', backdropFilter:'blur(10px)', borderRadius:20, padding:'10px 16px', display:'flex', alignItems:'center', gap:10, border:'1px solid rgba(255,255,255,0.25)' }}>
+              <span style={{ fontSize:16, opacity:.7 }}>🔍</span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher une conversation…" style={{ flex:1, background:'none', border:'none', outline:'none', fontSize:14, color:'#fff', fontFamily:'Nunito,system-ui,sans-serif', fontWeight:600 }} />
+            </div>
           </div>
         </div>
 

@@ -56,19 +56,24 @@ export default function TeleconsultPage() {
 
       <div style={{ minHeight:'100vh', background:'#f0faf6', fontFamily:'Nunito,system-ui,sans-serif', paddingBottom:100 }}>
 
-        {/* HEADER */}
-        <div style={{ background:`linear-gradient(160deg,${ACC2},${ACC})`, padding:'52px 20px 28px', borderRadius:'0 0 28px 28px', position:'relative', overflow:'hidden' }}>
-          <div style={{ position:'absolute', top:'-30px', right:'-30px', width:140, height:140, borderRadius:'50%', background:'rgba(255,255,255,.08)', pointerEvents:'none' }} />
-          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12 }}>
-            <button onClick={() => router.back()} style={{ width:40,height:40,borderRadius:12,background:'rgba(255,255,255,.2)',border:'none',color:'#fff',fontSize:20,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center' }}>←</button>
-            <div>
-              <div style={{ fontSize:20, fontWeight:900, color:'#fff' }}>Téléconsultation</div>
-              <div style={{ fontSize:11, color:'rgba(255,255,255,.7)', fontWeight:600 }}>Consultez depuis chez vous, en vidéo</div>
+        {/* HERO */}
+        <div style={{ position:'relative', height:260, overflow:'hidden' }}>
+          <img src="/images/Services/Teleconsultation 800x800 style reference.png" alt="Téléconsultation" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
+          <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,rgba(6,15,28,.88) 0%,rgba(11,29,53,.7) 45%,${ACC2}CC 100%)` }} />
+          <div style={{ position:'absolute', top:'-30px', right:'-30px', width:160, height:160, borderRadius:'50%', background:`${ACC}22`, pointerEvents:'none' }} />
+
+          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'0 20px 24px' }}>
+            <button onClick={() => router.back()} style={{ position:'absolute', top:52, left:20, width:40,height:40,borderRadius:13,background:'rgba(255,255,255,.18)',border:'1.5px solid rgba(255,255,255,.3)',color:'#fff',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',backdropFilter:'blur(10px)' }}>←</button>
+            <div style={{ fontSize:36, marginBottom:6 }}>🎥</div>
+            <div style={{ fontSize:11, fontWeight:800, color:'#a8edda', letterSpacing:'2px', textTransform:'uppercase', marginBottom:4 }}>Service médical</div>
+            <div style={{ fontSize:24, fontWeight:900, color:'#fff', lineHeight:1.2, marginBottom:10 }}>Téléconsultation</div>
+            <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+              <div style={{ background:'rgba(255,255,255,.15)', backdropFilter:'blur(10px)', borderRadius:10, padding:'6px 12px', display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ width:8,height:8,borderRadius:'50%',background:'#4ade80',display:'inline-block',animation:'pulseDot 1.5s ease-in-out infinite' }}/>
+                <span style={{ color:'#fff', fontSize:11, fontWeight:800 }}>Connexion sécurisée · Vidéo HD</span>
+              </div>
+              <div style={{ background:'rgba(168,237,218,.2)', backdropFilter:'blur(10px)', borderRadius:10, padding:'6px 12px', fontSize:11, color:'#a8edda', fontWeight:700 }}>7j/7 · 7h–22h</div>
             </div>
-          </div>
-          <div style={{ background:'rgba(255,255,255,.15)', backdropFilter:'blur(8px)', borderRadius:16, padding:'12px 16px', display:'inline-flex', alignItems:'center', gap:8 }}>
-            <span style={{ width:10,height:10,borderRadius:'50%',background:'#4ade80',display:'inline-block',animation:'pulseDot 1.5s ease-in-out infinite' }}/>
-            <span style={{ color:'#fff', fontSize:13, fontWeight:800 }}>Connexion sécurisée · Vidéo HD</span>
           </div>
         </div>
 
