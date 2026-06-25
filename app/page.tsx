@@ -89,20 +89,19 @@ export default function SplashPage() {
           display:'flex', flexDirection:'column', alignItems:'center',
         }}>
           <div style={{
-            width:136, height:136, borderRadius:32,
-            background:'rgba(255,255,255,.15)', backdropFilter:'blur(24px)',
+            width:136, height:136, borderRadius:'50%',
+            background:'rgba(255,255,255,.13)', backdropFilter:'blur(24px)',
             border:'2px solid rgba(255,255,255,.35)',
             display:'flex', alignItems:'center', justifyContent:'center',
             animation:'ringGlow 2.2s ease-in-out infinite alternate',
-            position:'relative', overflow:'hidden',
+            position:'relative',
           }}>
             <div style={{
-              position:'absolute', inset:8, borderRadius:24,
+              position:'absolute', inset:8, borderRadius:'50%',
               border:'1.5px dashed rgba(255,255,255,.3)',
               animation:'ringRotate 10s linear infinite',
             }} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/Logo Oria Care 192 par 192.png" alt="Oria Care" style={{ width:100, height:100, objectFit:'contain', position:'relative', zIndex:2 }} />
+            <span style={{ fontSize:58, color:'#fff', textShadow:'0 0 36px rgba(255,255,255,.9)', position:'relative', zIndex:2 }}>✚</span>
           </div>
 
           <div style={{
