@@ -52,10 +52,33 @@ if (!isDev) {
     skipWaiting: true,
     clientsClaim: true,
     disable: false,
-    // Force tous les clients à recharger immédiatement après mise à jour SW
     workboxOptions: {
       skipWaiting: true,
       clientsClaim: true,
+      // Changer ce nom force le navigateur à créer un nouveau SW et détruit l'ancien cache
+      cacheId: 'oria-care-v3',
+      // Les pages HTML sont toujours récupérées depuis le réseau (jamais depuis le cache)
+      // → garantit que les mises à jour Vercel sont visibles immédiatement
+      runtimeCaching: [
+        {
+          urlPattern: /^https:\/\/shido-connect\.vercel\.app\/.*/,
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'oria-care-pages-v3',
+            networkTimeoutSeconds: 10,
+            expiration: { maxEntries: 32, maxAgeSeconds: 24 * 60 * 60 },
+            cacheableResponse: { statuses: [200] },
+          },
+        },
+        {
+          urlPattern: /\.(js|css|woff2?|png|jpg|svg|ico)(\?.*)?$/,
+          handler: 'StaleWhileRevalidate',
+          options: {
+            cacheName: 'oria-care-assets-v3',
+            expiration: { maxEntries: 128, maxAgeSeconds: 30 * 24 * 60 * 60 },
+          },
+        },
+      ],
     },
   });
   finalConfig = withPWA(finalConfig);
