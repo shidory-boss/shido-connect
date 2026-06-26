@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { usePWAConfig } from '@/core/PWAConfigContext'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -74,7 +75,7 @@ export default function InstallBanner() {
       <button onClick={dismiss} style={{ position:'absolute', top:10, right:12, background:'none', border:'none', fontSize:18, cursor:'pointer', color:'#94a3b8' }}>×</button>
 
       <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:10 }}>
-        <img src="/icons/icon-192x192.png" alt="Oria Care" style={{ width:44, height:44, borderRadius:12, objectFit:'cover', flexShrink:0 }} />
+        <Image src="/icons/icon-192x192.png" alt="Oria Care" width={44} height={44} style={{ borderRadius:12, objectFit:'cover', flexShrink:0 }} />
         <div>
           <div style={{ fontSize:14, fontWeight:800, color:'#0f172a' }}>Installer {config?.pwa_name || config?.clinic_name || 'Oria Care'}</div>
           <div style={{ fontSize:12, color:'#64748b' }}>Accès rapide depuis votre écran d'accueil</div>

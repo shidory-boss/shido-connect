@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { publicAppointmentApi } from '@/lib/api'
 
@@ -76,7 +77,7 @@ export default function TeleconsultPage() {
 
         {/* HERO */}
         <div style={{ position:'relative', height:260, overflow:'hidden' }}>
-          <img src="/images/Services/Teleconsultation 800x800 style reference.png" alt="Téléconsultation" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
+          <Image src="/images/Services/Teleconsultation 800x800 style reference.png" alt="Téléconsultation" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} priority />
           <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,rgba(6,15,28,.88) 0%,rgba(11,29,53,.7) 45%,${ACC2}CC 100%)` }} />
           <div style={{ position:'absolute', top:'-30px', right:'-30px', width:160, height:160, borderRadius:'50%', background:`${ACC}22`, pointerEvents:'none' }} />
 
@@ -119,7 +120,7 @@ export default function TeleconsultPage() {
                     }}>
                       <div style={{ width:56,height:56,borderRadius:16,overflow:'hidden',flexShrink:0,position:'relative',border:`2px solid ${isActive ? ACC : '#e2e8f0'}` }}>
                         {getPhoto(d)
-                          ? <img src={getPhoto(d)!} alt={d.first_name} style={{ width:'100%',height:'100%',objectFit:'cover',objectPosition:'top' }} />
+                          ? <Image src={getPhoto(d)!} alt={d.first_name} fill sizes="56px" unoptimized={!!getPhoto(d)?.startsWith('http')} style={{ objectFit:'cover', objectPosition:'top' }} />
                           : <div style={{ width:'100%',height:'100%',background:isActive?ACC+'22':'#e2e8f0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:24 }}>👨‍⚕️</div>
                         }
                         <span style={{ position:'absolute',bottom:2,right:2,width:11,height:11,borderRadius:'50%',background:'#4ade80',border:'2px solid #fff',animation:'pulseDot 1.5s ease-in-out infinite' }}/>

@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { use } from 'react'
@@ -115,7 +116,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
 
         {/* ── HERO ── */}
         <div style={{ position:'relative', height:300, overflow:'hidden' }}>
-          <img src={s.img} alt={s.label} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
+          <Image src={s.img} alt={s.label} fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} priority />
           <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,rgba(6,15,28,.9) 0%,rgba(11,29,53,.75) 45%,${s.dark}CC 100%)` }} />
           <div style={{ position:'absolute', top:'-30px', right:'-30px', width:160, height:160, borderRadius:'50%', background:`${s.color}22`, pointerEvents:'none' }} />
 

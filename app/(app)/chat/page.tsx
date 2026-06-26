@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 const ACC  = '#1D9E75'
@@ -80,7 +81,7 @@ export default function ChatPage() {
 
         {/* HERO */}
         <div style={{ position:'relative', height:220, overflow:'hidden' }}>
-          <img src="/images/Hero message.png" alt="Messages" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
+          <Image src="/images/Hero message.png" alt="Messages" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} priority />
           <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,rgba(6,15,28,.88) 0%,rgba(11,29,53,.7) 45%,${ACC2}CC 100%)` }} />
           <div style={{ position:'absolute', top:'-30px', right:'-30px', width:160, height:160, borderRadius:'50%', background:`${ACC}22`, pointerEvents:'none' }} />
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'0 20px 16px' }}>

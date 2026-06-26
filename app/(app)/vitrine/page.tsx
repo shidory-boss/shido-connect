@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useClinicConfig } from '@/lib/useClinicConfig'
 
@@ -239,7 +240,7 @@ export default function VitrinePage() {
               <div key={i} className="team-card" style={{ background:'#fff', borderRadius:24, overflow:'hidden', boxShadow:'0 8px 28px rgba(0,0,0,.1)', display:'flex', gap:0, animation:`slideRight .5s ease ${i*0.12+0.2}s both` }}>
                 {/* Photo */}
                 <div style={{ width:110, flexShrink:0, position:'relative', overflow:'hidden' }}>
-                  <img src={m.img} alt={m.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+                  <Image src={m.img} alt={m.name} fill sizes="110px" style={{ objectFit:'cover' }} />
                   <div className="team-overlay" style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${acc2}cc,${acc}cc)`, opacity:0, transition:'opacity .3s' }} />
                 </div>
                 {/* Infos */}
@@ -277,7 +278,7 @@ export default function VitrinePage() {
               {TESTIMONIALS[activeTestim].text}
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <img src={TESTIMONIALS[activeTestim].img} alt="" style={{ width:48, height:48, borderRadius:'50%', objectFit:'cover', border:'3px solid rgba(255,255,255,.4)' }} />
+              <Image src={TESTIMONIALS[activeTestim].img} alt="" width={48} height={48} style={{ borderRadius:'50%', objectFit:'cover', border:'3px solid rgba(255,255,255,.4)' }} />
               <div>
                 <div style={{ fontSize:14, fontWeight:900, color:'#fff' }}>{TESTIMONIALS[activeTestim].name}</div>
                 <div style={{ fontSize:11, color:'rgba(255,255,255,.75)', fontWeight:700 }}>{TESTIMONIALS[activeTestim].service}</div>

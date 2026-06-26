@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, Suspense } from 'react'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { publicAppointmentApi } from '@/lib/api'
 
@@ -302,7 +303,7 @@ function BookingInner() {
 
         {/* ══ HERO ══ */}
         <div style={{ position:'relative', height:300, overflow:'hidden' }}>
-          <img src={HERO_IMG} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 20%' }} />
+          <Image src={HERO_IMG} alt="" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center 20%' }} priority />
           <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,${ACC2}cc 0%,${BLUE2}cc 50%,rgba(10,20,40,.96) 100%)` }} />
 
           {/* Bouton retour */}
@@ -681,9 +682,9 @@ function BookingInner() {
                           border:`1.5px solid ${isActive ? ACC : '#e2e8f0'}`,
                           background: isActive ? ACC + '12' : '#fff',
                         }}>
-                          <div style={{ width:44, height:44, borderRadius:14, overflow:'hidden', flexShrink:0, border:`1.5px solid ${isActive ? ACC : '#e2e8f0'}` }}>
+                          <div style={{ width:44, height:44, borderRadius:14, overflow:'hidden', flexShrink:0, border:`1.5px solid ${isActive ? ACC : '#e2e8f0'}`, position:'relative' }}>
                             {getDoctorPhoto(d)
-                              ? <img src={getDoctorPhoto(d)!} alt={d.first_name} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'top' }} />
+                              ? <Image src={getDoctorPhoto(d)!} alt={d.first_name} fill sizes="44px" unoptimized={!!getDoctorPhoto(d)?.startsWith('http')} style={{ objectFit:'cover', objectPosition:'top' }} />
                               : <div style={{ width:'100%', height:'100%', background: isActive ? ACC+'22' : '#f1f5f9', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>👨‍⚕️</div>
                             }
                           </div>

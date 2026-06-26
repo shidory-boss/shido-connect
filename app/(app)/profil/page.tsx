@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { localAuth, type LocalPatient } from '@/lib/localAuth'
@@ -125,7 +126,7 @@ export default function ProfilPage() {
 
         {/* HERO */}
         <div style={{ position:'relative', height:280, overflow:'hidden' }}>
-          <img src="/images/Hero 2.png" alt="profil" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
+          <Image src="/images/Hero 2.png" alt="profil" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center top' }} priority />
           <div style={{ position:'absolute', inset:0, background:'linear-gradient(160deg,rgba(6,15,28,.82) 0%,rgba(11,29,53,.7) 40%,rgba(15,110,86,.75) 100%)' }} />
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end', paddingBottom:44, textAlign:'center' }}>
             <div style={{ width:80,height:80,borderRadius:'50%',background:'rgba(255,255,255,.15)',border:'3px solid rgba(255,255,255,.35)',backdropFilter:'blur(10px)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,fontWeight:900,color:'#fff',marginBottom:12,animation:'glow 2.5s ease-in-out infinite' }}>

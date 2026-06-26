@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useClinicConfig } from '@/lib/useClinicConfig'
 
@@ -309,7 +310,7 @@ export default function HomePage() {
                     el.appendChild(rip)
                     setTimeout(() => rip.remove(), 600)
                   }}>
-                  <img src={s.img} alt={s.label} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', display:'block' }} />
+                  <Image src={s.img} alt={s.label} fill sizes="50vw" style={{ objectFit:'cover', objectPosition:'center' }} />
                   <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,transparent 20%,${s.dark}DD 100%)` }} />
                   <div style={{ position:'absolute', top:10, left:10, width:34, height:34, borderRadius:10, background:'rgba(255,255,255,.2)', backdropFilter:'blur(8px)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}>{s.icon}</div>
                   <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 12px' }}>
@@ -361,7 +362,7 @@ export default function HomePage() {
             {TEAM.map((m, i) => (
               <div key={i} className="team-card" style={{ background:'#fff', borderRadius:24, overflow:'hidden', boxShadow:'0 8px 28px rgba(0,0,0,.1)', display:'flex', animation:`slideRight .5s ease ${i*0.12+0.2}s both, cardPulse ${4+i*0.5}s ease-in-out ${i*0.8}s infinite` }}>
                 <div style={{ width:110, flexShrink:0, position:'relative', overflow:'hidden' }}>
-                  <img src={m.img} alt={m.name} className="team-img" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', animationDelay:`${i*1.2}s` }} />
+                  <Image src={m.img} alt={m.name} fill sizes="110px" style={{ objectFit:'cover' }} />
                   <div className="team-overlay" style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${acc2}cc,${acc}cc)`, opacity:0, transition:'opacity .3s' }} />
                 </div>
                 <div style={{ flex:1, padding:'18px 16px' }}>
@@ -388,7 +389,7 @@ export default function HomePage() {
               {TESTIMONIALS[activeTestim].text}
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <img src={TESTIMONIALS[activeTestim].img} alt="" style={{ width:48, height:48, borderRadius:'50%', objectFit:'cover', border:'3px solid rgba(255,255,255,.4)' }} />
+              <Image src={TESTIMONIALS[activeTestim].img} alt="" width={48} height={48} style={{ borderRadius:'50%', objectFit:'cover', border:'3px solid rgba(255,255,255,.4)' }} />
               <div>
                 <div style={{ fontSize:14, fontWeight:900, color:'#fff' }}>{TESTIMONIALS[activeTestim].name}</div>
                 <div style={{ fontSize:11, color:'rgba(255,255,255,.75)', fontWeight:700 }}>{TESTIMONIALS[activeTestim].service}</div>

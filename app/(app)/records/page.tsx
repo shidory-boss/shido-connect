@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 const ACC  = '#1D9E75'
@@ -197,7 +198,7 @@ export default function RecordsPage() {
 
         {/* HERO */}
         <div style={{ position:'relative', height:200, overflow:'hidden' }}>
-          <img src="/images/Services/Radiologie et Imagerie 800x800 style reference.png" alt="dossier" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
+          <Image src="/images/Services/Radiologie et Imagerie 800x800 style reference.png" alt="dossier" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} priority />
           <div style={{ position:'absolute', inset:0, background:'linear-gradient(160deg,rgba(6,15,28,.88) 0%,rgba(11,29,53,.75) 50%,rgba(15,110,86,.65) 100%)' }} />
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'0 20px 20px' }}>
             <button onClick={() => router.back()} style={{ position:'absolute', top:48, left:20, width:40,height:40,borderRadius:13,background:'rgba(255,255,255,.18)',border:'1.5px solid rgba(255,255,255,.3)',color:'#fff',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',backdropFilter:'blur(10px)' }}>←</button>

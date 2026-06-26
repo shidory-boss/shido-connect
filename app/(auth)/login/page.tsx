@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { authApi } from '@/lib/api'
 import { storage } from '@/lib/storage'
@@ -211,7 +212,7 @@ export default function LoginPage() {
               boxShadow: '0 12px 40px rgba(0,0,0,0.2)',
             }}>
               {config.logo_url
-                ? <img src={config.logo_url} alt="logo" style={{ width:52, height:52, borderRadius:12, objectFit:'cover' }} />
+                ? <Image src={config.logo_url} alt="logo" width={52} height={52} unoptimized style={{ borderRadius:12, objectFit:'cover' }} />
                 : '🏥'}
             </div>
 

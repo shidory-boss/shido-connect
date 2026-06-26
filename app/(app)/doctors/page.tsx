@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { publicAppointmentApi } from '@/lib/api'
@@ -108,7 +109,7 @@ export default function DoctorsPage() {
                       {/* Photo */}
                       <div style={{ height:110, background:'#f1f5f9', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
                         {photo
-                          ? <img src={photo} alt={d.first_name} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'top' }} />
+                          ? <Image src={photo} alt={d.first_name} fill sizes="50vw" unoptimized={photo.startsWith('http')} style={{ objectFit:'cover', objectPosition:'top' }} />
                           : <div style={{ fontSize:48 }}>👨‍⚕️</div>
                         }
                         <div style={{ position:'absolute', top:10, right:10, width:10, height:10, borderRadius:'50%', background:'#10b981', border:'2px solid #fff', animation:'pulseDot 1.5s ease-in-out infinite' }} />

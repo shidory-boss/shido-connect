@@ -31,7 +31,13 @@ const securityHeaders = [
 ]
 
 let finalConfig: NextConfig = {
-  images: { unoptimized: true },
+  images: {
+    formats: ['image/webp', 'image/avif'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'api.emiyacosmetics.com' },
+      { protocol: 'http', hostname: 'localhost', port: '8001' },
+    ],
+  },
   turbopack: {
     root: __dirname,
   },

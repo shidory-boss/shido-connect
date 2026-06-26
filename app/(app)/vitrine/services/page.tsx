@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useClinicConfig } from '@/lib/useClinicConfig'
@@ -80,7 +81,7 @@ export default function VitrineServicesPage() {
             HERO — photo plein écran
         ══════════════════════════════════════ */}
         <div style={{ position:'relative', height:480, overflow:'hidden' }}>
-          <img src={HERO_IMG} alt="Services" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
+          <Image src={HERO_IMG} alt="Services" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center top' }} priority />
           {/* Overlay vert → bleu */}
           <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,${acc2}99 0%,${BLUE2}cc 50%,rgba(10,22,40,.97) 100%)` }} />
           {/* Orbe */}
@@ -136,7 +137,7 @@ export default function VitrineServicesPage() {
             {SERVICES.map((s, i) => (
               <div key={i} className="svc-card" style={{ borderRadius:22, overflow:'hidden', boxShadow:'0 8px 28px rgba(0,0,0,.15)', position:'relative', height:200, animation:`scaleIn .4s ease ${i*0.06}s both` }}>
                 {/* Photo fond */}
-                <img src={s.img} alt={s.title} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+                <Image src={s.img} alt={s.title} fill sizes="50vw" style={{ objectFit:'cover' }} />
                 {/* Overlay dégradé vert ou bleu */}
                 <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,${s.color}55 0%,rgba(10,20,40,.85) 60%,rgba(10,20,40,.97) 100%)` }} />
                 {/* Contenu */}
@@ -207,7 +208,7 @@ export default function VitrineServicesPage() {
               {TESTIMONIALS[activeTestim].text}
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <img src={TESTIMONIALS[activeTestim].img} alt="" style={{ width:50, height:50, borderRadius:'50%', objectFit:'cover', border:'3px solid rgba(255,255,255,.4)' }} />
+              <Image src={TESTIMONIALS[activeTestim].img} alt="" width={50} height={50} style={{ borderRadius:'50%', objectFit:'cover', border:'3px solid rgba(255,255,255,.4)' }} />
               <div>
                 <div style={{ fontSize:14, fontWeight:900, color:'#fff' }}>{TESTIMONIALS[activeTestim].name}</div>
                 <div style={{ fontSize:11, color:'rgba(255,255,255,.75)', fontWeight:700 }}>{TESTIMONIALS[activeTestim].service}</div>
@@ -228,7 +229,7 @@ export default function VitrineServicesPage() {
             {TESTIMONIALS.slice(0,4).map((t, i) => (
               <div key={i} onClick={() => setActiveTestim(i)} style={{ background: activeTestim===i ? `${acc}12` : '#fff', borderRadius:18, padding:'14px', border:`1.5px solid ${activeTestim===i ? acc+'44' : '#f1f5f9'}`, cursor:'pointer', transition:'all .2s' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
-                  <img src={t.img} alt="" style={{ width:34, height:34, borderRadius:'50%', objectFit:'cover' }} />
+                  <Image src={t.img} alt="" width={34} height={34} style={{ borderRadius:'50%', objectFit:'cover' }} />
                   <div>
                     <div style={{ fontSize:11, fontWeight:900, color:'#0f172a' }}>{t.name}</div>
                     <div style={{ fontSize:9, color:acc, fontWeight:800 }}>{t.service}</div>
