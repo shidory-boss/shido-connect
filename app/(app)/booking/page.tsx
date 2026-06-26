@@ -380,7 +380,7 @@ export default function BookingPage() {
               </div>
               <div style={{ marginTop:12 }}>
                 <label style={lbl}>Date de naissance</label>
-                <div style={{ display:'grid', gridTemplateColumns:'2fr 3fr 2fr', gap:8 }}>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:8, marginBottom:8 }}>
                   <select style={selDate} value={form.date_of_birth ? form.date_of_birth.split('-')[2] : ''} onChange={e => {
                     const [y, m] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01']
                     if (e.target.value) set('date_of_birth', `${y||'2000'}-${m||'01'}-${e.target.value}`)
@@ -395,14 +395,14 @@ export default function BookingPage() {
                     <option value="">Mois</option>
                     {['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'].map((m,i)=><option key={i} value={String(i+1).padStart(2,'0')}>{m}</option>)}
                   </select>
-                  <select style={selDate} value={form.date_of_birth ? form.date_of_birth.split('-')[0] : ''} onChange={e => {
-                    const [,m,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01','01']
-                    if (e.target.value) set('date_of_birth', `${e.target.value}-${m||'01'}-${d||'01'}`)
-                  }}>
-                    <option value="">Année</option>
-                    {Array.from({length:100},(_,i)=>new Date().getFullYear()-i).map(y=><option key={y} value={y}>{y}</option>)}
-                  </select>
                 </div>
+                <select style={selDate} value={form.date_of_birth ? form.date_of_birth.split('-')[0] : ''} onChange={e => {
+                  const [,m,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01','01']
+                  if (e.target.value) set('date_of_birth', `${e.target.value}-${m||'01'}-${d||'01'}`)
+                }}>
+                  <option value="">Année de naissance</option>
+                  {Array.from({length:100},(_,i)=>2026-i).map(y=><option key={y} value={y}>{y}</option>)}
+                </select>
               </div>
               <div style={{ marginTop:12 }}>
                 <label style={lbl}>Genre</label>
