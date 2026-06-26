@@ -380,29 +380,55 @@ export default function BookingPage() {
               </div>
               <div style={{ marginTop:12 }}>
                 <label style={lbl}>Date de naissance</label>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:8, marginBottom:8 }}>
-                  <select style={selDate} value={form.date_of_birth ? form.date_of_birth.split('-')[2] : ''} onChange={e => {
-                    const [y, m] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01']
-                    if (e.target.value) set('date_of_birth', `${y||'2000'}-${m||'01'}-${e.target.value}`)
-                  }}>
-                    <option value="">Jour</option>
-                    {Array.from({length:31},(_,i)=>i+1).map(d=><option key={d} value={String(d).padStart(2,'0')}>{d}</option>)}
-                  </select>
-                  <select style={selDate} value={form.date_of_birth ? form.date_of_birth.split('-')[1] : ''} onChange={e => {
-                    const [y,,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01','01']
-                    if (e.target.value) set('date_of_birth', `${y||'2000'}-${e.target.value}-${d||'01'}`)
-                  }}>
-                    <option value="">Mois</option>
-                    {['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'].map((m,i)=><option key={i} value={String(i+1).padStart(2,'0')}>{m}</option>)}
-                  </select>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 2fr', gap:8 }}>
+                  <div>
+                    <div style={{ fontSize:10, color:'#94a3b8', fontWeight:700, marginBottom:4, textAlign:'center' }}>JOUR</div>
+                    <input
+                      id="dob-day"
+                      type="text" inputMode="numeric" pattern="[0-9]*"
+                      maxLength={2} placeholder="JJ"
+                      value={form.date_of_birth ? form.date_of_birth.split('-')[2] : ''}
+                      onChange={e => {
+                        const v = e.target.value.replace(/\D/g,'').slice(0,2)
+                        const [y,m] = form.date_of_birth ? form.date_of_birth.split('-') : ['','']
+                        set('date_of_birth', `${y||''}-${m||''}-${v}`)
+                        if (v.length === 2) document.getElementById('dob-month')?.focus()
+                      }}
+                      style={{ ...inp, textAlign:'center', fontSize:18, fontWeight:700 }}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontSize:10, color:'#94a3b8', fontWeight:700, marginBottom:4, textAlign:'center' }}>MOIS</div>
+                    <input
+                      id="dob-month"
+                      type="text" inputMode="numeric" pattern="[0-9]*"
+                      maxLength={2} placeholder="MM"
+                      value={form.date_of_birth ? form.date_of_birth.split('-')[1] : ''}
+                      onChange={e => {
+                        const v = e.target.value.replace(/\D/g,'').slice(0,2)
+                        const [y,,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['','','']
+                        set('date_of_birth', `${y||''}-${v}-${d||''}`)
+                        if (v.length === 2) document.getElementById('dob-year')?.focus()
+                      }}
+                      style={{ ...inp, textAlign:'center', fontSize:18, fontWeight:700 }}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontSize:10, color:'#94a3b8', fontWeight:700, marginBottom:4, textAlign:'center' }}>ANNÉE</div>
+                    <input
+                      id="dob-year"
+                      type="text" inputMode="numeric" pattern="[0-9]*"
+                      maxLength={4} placeholder="AAAA"
+                      value={form.date_of_birth ? form.date_of_birth.split('-')[0] : ''}
+                      onChange={e => {
+                        const v = e.target.value.replace(/\D/g,'').slice(0,4)
+                        const [,m,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['','','']
+                        set('date_of_birth', `${v}-${m||''}-${d||''}`)
+                      }}
+                      style={{ ...inp, textAlign:'center', fontSize:18, fontWeight:700 }}
+                    />
+                  </div>
                 </div>
-                <select style={selDate} value={form.date_of_birth ? form.date_of_birth.split('-')[0] : ''} onChange={e => {
-                  const [,m,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01','01']
-                  if (e.target.value) set('date_of_birth', `${e.target.value}-${m||'01'}-${d||'01'}`)
-                }}>
-                  <option value="">Année de naissance</option>
-                  {Array.from({length:100},(_,i)=>2026-i).map(y=><option key={y} value={y}>{y}</option>)}
-                </select>
               </div>
               <div style={{ marginTop:12 }}>
                 <label style={lbl}>Genre</label>
