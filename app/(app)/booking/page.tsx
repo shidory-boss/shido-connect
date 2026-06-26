@@ -247,6 +247,12 @@ export default function BookingPage() {
     boxSizing:'border-box',
   }
   const sel: React.CSSProperties = { ...inp, cursor:'pointer' }
+  const selDate: React.CSSProperties = {
+    ...inp, cursor:'pointer',
+    WebkitAppearance: 'menulist' as any,
+    appearance: 'auto' as any,
+    padding:'13px 8px',
+  }
   const lbl: React.CSSProperties = { fontSize:11, fontWeight:700, color:'#64748b', textTransform:'uppercase' as const, letterSpacing:'.7px', display:'block', marginBottom:7 }
 
   const cardStyle: React.CSSProperties = {
@@ -375,21 +381,21 @@ export default function BookingPage() {
               <div style={{ marginTop:12 }}>
                 <label style={lbl}>Date de naissance</label>
                 <div style={{ display:'grid', gridTemplateColumns:'2fr 3fr 2fr', gap:8 }}>
-                  <select style={sel} value={form.date_of_birth ? form.date_of_birth.split('-')[2] : ''} onChange={e => {
+                  <select style={selDate} value={form.date_of_birth ? form.date_of_birth.split('-')[2] : ''} onChange={e => {
                     const [y, m] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01']
                     if (e.target.value) set('date_of_birth', `${y||'2000'}-${m||'01'}-${e.target.value}`)
                   }}>
                     <option value="">Jour</option>
                     {Array.from({length:31},(_,i)=>i+1).map(d=><option key={d} value={String(d).padStart(2,'0')}>{d}</option>)}
                   </select>
-                  <select style={sel} value={form.date_of_birth ? form.date_of_birth.split('-')[1] : ''} onChange={e => {
+                  <select style={selDate} value={form.date_of_birth ? form.date_of_birth.split('-')[1] : ''} onChange={e => {
                     const [y,,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01','01']
                     if (e.target.value) set('date_of_birth', `${y||'2000'}-${e.target.value}-${d||'01'}`)
                   }}>
                     <option value="">Mois</option>
                     {['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'].map((m,i)=><option key={i} value={String(i+1).padStart(2,'0')}>{m}</option>)}
                   </select>
-                  <select style={sel} value={form.date_of_birth ? form.date_of_birth.split('-')[0] : ''} onChange={e => {
+                  <select style={selDate} value={form.date_of_birth ? form.date_of_birth.split('-')[0] : ''} onChange={e => {
                     const [,m,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['2000','01','01']
                     if (e.target.value) set('date_of_birth', `${e.target.value}-${m||'01'}-${d||'01'}`)
                   }}>
