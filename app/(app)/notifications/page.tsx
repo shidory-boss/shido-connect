@@ -7,17 +7,9 @@ const ACC2 = '#0F6E56'
 
 type Notif = { id:number; icon:string; title:string; body:string; time:string; read:boolean; color:string }
 
-const INITIAL_NOTIFS: Notif[] = [
-  { id:1, icon:'📅', title:'Rappel Rendez-vous', body:'Votre prochain rendez-vous est confirmé. Consultez votre espace pour les détails.', time:'Il y a 2 heures', read:false, color:'#0B1D35' },
-  { id:2, icon:'✅', title:'Résultats Disponibles', body:'Vos résultats d\'analyse sanguine (NFS) sont disponibles dans votre espace.', time:'Il y a 5 heures', read:false, color:'#10B981' },
-  { id:3, icon:'💊', title:'Rappel Médicament', body:'N\'oubliez pas votre Paracétamol 500mg ce soir à 20:00.', time:'Il y a 8 heures', read:false, color:'#8B5CF6' },
-  { id:4, icon:'⭐', title:'Évaluez votre Consultation', body:'Comment s\'est passée votre consultation avec Dr. Yan ?', time:'Hier', read:true, color:'#F59E0B' },
-  { id:5, icon:'🎉', title:'Bienvenue chez Oria Care !', body:'Votre compte est créé avec succès. Prenez bien soin de vous.', time:'Il y a 3 jours', read:true, color:ACC },
-]
-
 export default function NotificationsPage() {
   const router = useRouter()
-  const [notifs, setNotifs] = useState<Notif[]>(INITIAL_NOTIFS)
+  const [notifs, setNotifs] = useState<Notif[]>([])
 
   const markRead = (id: number) => setNotifs(ns => ns.map(n => n.id===id ? {...n,read:true} : n))
   const markAllRead = () => setNotifs(ns => ns.map(n => ({...n,read:true})))
@@ -55,6 +47,13 @@ export default function NotificationsPage() {
         </div>
 
         <div style={{ padding:'20px', display:'flex', flexDirection:'column', gap:12 }}>
+          {notifs.length === 0 && (
+            <div style={{ textAlign:'center', padding:'60px 20px', color:'#94a3b8' }}>
+              <div style={{ fontSize:48, marginBottom:12 }}>🔔</div>
+              <div style={{ fontSize:15, fontWeight:800, marginBottom:6, color:'#64748b' }}>Aucune notification</div>
+              <div style={{ fontSize:13, fontWeight:600 }}>Vos rappels et alertes médicales apparaîtront ici.</div>
+            </div>
+          )}
           {notifs.map((n, i) => (
             <div key={n.id} className="notif-item" onClick={() => markRead(n.id)} style={{
               background:'#fff', borderRadius:18, padding:'16px',

@@ -33,7 +33,7 @@ export const storage = {
   setPatient: (p: Patient) => localStorage.setItem(KEYS.PATIENT, JSON.stringify(p)),
   getPatient: (): Patient | null => {
     const raw = localStorage.getItem(KEYS.PATIENT)
-    return raw ? JSON.parse(raw) : null
+    try { return raw ? JSON.parse(raw) : null } catch { return null }
   },
   clearPatient: () => localStorage.removeItem(KEYS.PATIENT),
 
@@ -44,7 +44,7 @@ export const storage = {
   },
   getConfig: (): PWAConfig | null => {
     const raw = localStorage.getItem(KEYS.CONFIG)
-    return raw ? JSON.parse(raw) : null
+    try { return raw ? JSON.parse(raw) : null } catch { return null }
   },
   isConfigStale: (): boolean => {
     const ttl = localStorage.getItem(KEYS.CONFIG_TTL)
@@ -59,7 +59,7 @@ export const storage = {
   },
   getModules: (): PWAActiveModule[] | null => {
     const raw = localStorage.getItem(KEYS.MODULES)
-    return raw ? JSON.parse(raw) : null
+    try { return raw ? JSON.parse(raw) : null } catch { return null }
   },
   isModulesStale: (): boolean => {
     const ttl = localStorage.getItem(KEYS.MODULES_TTL)
@@ -85,11 +85,14 @@ export const storage = {
 
   // Notifications lues
   markNotifRead: (id: string) => {
-    const a = JSON.parse(localStorage.getItem(KEYS.NOTIF_READ) || '[]')
-    if (!a.includes(id)) { a.push(id); localStorage.setItem(KEYS.NOTIF_READ, JSON.stringify(a)) }
+    try {
+      const a = JSON.parse(localStorage.getItem(KEYS.NOTIF_READ) || '[]')
+      if (!a.includes(id)) { a.push(id); localStorage.setItem(KEYS.NOTIF_READ, JSON.stringify(a)) }
+    } catch { localStorage.setItem(KEYS.NOTIF_READ, JSON.stringify([id])) }
   },
-  isNotifRead: (id: string): boolean =>
-    JSON.parse(localStorage.getItem(KEYS.NOTIF_READ) || '[]').includes(id),
+  isNotifRead: (id: string): boolean => {
+    try { return JSON.parse(localStorage.getItem(KEYS.NOTIF_READ) || '[]').includes(id) } catch { return false }
+  },
 
   // Brouillon chat
   saveChatDraft: (m: string) => localStorage.setItem(KEYS.CHAT_DRAFT, m),
@@ -98,11 +101,14 @@ export const storage = {
 
   // Préférences utilisateur
   setPrefs: (p: Record<string, unknown>) => {
-    const e = JSON.parse(localStorage.getItem(KEYS.PREFS) || '{}')
-    localStorage.setItem(KEYS.PREFS, JSON.stringify({ ...e, ...p }))
+    try {
+      const e = JSON.parse(localStorage.getItem(KEYS.PREFS) || '{}')
+      localStorage.setItem(KEYS.PREFS, JSON.stringify({ ...e, ...p }))
+    } catch { localStorage.setItem(KEYS.PREFS, JSON.stringify(p)) }
   },
-  getPrefs: (): Record<string, unknown> =>
-    JSON.parse(localStorage.getItem(KEYS.PREFS) || '{}'),
+  getPrefs: (): Record<string, unknown> => {
+    try { return JSON.parse(localStorage.getItem(KEYS.PREFS) || '{}') } catch { return {} }
+  },
 
   // Déconnexion auth uniquement
   clearAuth: () => {

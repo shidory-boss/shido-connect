@@ -19,10 +19,10 @@ export default function PaymentPage() {
   const [threeTimes, setThreeTimes] = useState(false)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [ref, setRef] = useState('SHD-2025-00001')
+  const [ref, setRef] = useState('')
 
   useEffect(() => {
-    setRef('SHD-2025-' + (Math.floor(10000 + Math.random() * 90000)))
+    setRef('SHD-' + new Date().getFullYear() + '-' + (Math.floor(10000 + Math.random() * 90000)))
   }, [])
 
   const pay = async () => {

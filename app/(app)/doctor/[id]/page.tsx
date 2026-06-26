@@ -151,7 +151,7 @@ export default function DoctorDetailPage() {
 
         {/* CTA FIXE */}
         <div style={{ position:'fixed', bottom:80, left:'50%', transform:'translateX(-50%)', width:'calc(100% - 40px)', maxWidth:380 }}>
-          <button onClick={() => router.push('/booking')} style={{ width:'100%', padding:'18px', background:`linear-gradient(135deg,${ACC2},${ACC})`, border:'none', borderRadius:18, fontSize:16, fontWeight:900, color:'#fff', cursor:'pointer', animation:'ctaglow 2s ease-in-out infinite alternate' }}>
+          <button onClick={() => router.push(`/booking?doctor_id=${id}`)} style={{ width:'100%', padding:'18px', background:`linear-gradient(135deg,${ACC2},${ACC})`, border:'none', borderRadius:18, fontSize:16, fontWeight:900, color:'#fff', cursor:'pointer', animation:'ctaglow 2s ease-in-out infinite alternate' }}>
             🗓 Prendre Rendez-vous
           </button>
         </div>

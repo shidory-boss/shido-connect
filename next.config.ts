@@ -24,7 +24,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob:",
-      "connect-src 'self' http://localhost:8001 ws://localhost:8001 ws://localhost:8765 https://*.shidoos.ci https://api.emiyacosmetics.com",
+      "connect-src 'self' http://localhost:8001 ws://localhost:8001 ws://localhost:8765 https://*.shidoos.ci https://api.emiyacosmetics.com wss://api.emiyacosmetics.com",
       "frame-ancestors 'none'",
     ].join('; '),
   },

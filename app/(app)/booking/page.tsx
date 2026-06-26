@@ -1,6 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { publicAppointmentApi } from '@/lib/api'
 
 const ACC  = '#1D9E75'
@@ -110,8 +110,9 @@ const DOCTOR_PHOTOS: Record<string, string> = {
 }
 const getDoctorPhoto = (d: Doctor) => d.img || DOCTOR_PHOTOS[d.first_name]
 
-export default function BookingPage() {
+function BookingInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [step, setStep]       = useState(0)
   const [form, setForm]       = useState<Form>(EMPTY)
   const [calendar, setCalendar] = useState<string[]>([])
@@ -139,7 +140,15 @@ export default function BookingPage() {
     const loadDoctors = async () => {
       try {
         const list = await publicAppointmentApi.getDoctors()
-        if (Array.isArray(list) && list.length > 0) setDoctors(list)
+        if (Array.isArray(list) && list.length > 0) {
+          setDoctors(list)
+          // Pré-sélectionner le médecin si passé en query param
+          const doctorIdParam = searchParams.get('doctor_id')
+          if (doctorIdParam) {
+            const did = parseInt(doctorIdParam)
+            if (!isNaN(did)) setForm(f => ({ ...f, doctor_id: did }))
+          }
+        }
       } catch { /* backend non joignable */ } finally {
         setDoctorsLoading(false)
       }
@@ -191,8 +200,7 @@ export default function BookingPage() {
       const doctorObj = doctors.find(d => d.id === form.doctor_id)
       const doctorName = doctorObj ? `Dr. ${doctorObj.first_name} ${doctorObj.last_name}`.trim() : ''
       const scheduledAt = form.rdv_date && form.rdv_time ? `${form.rdv_date}T${form.rdv_time}:00` : ''
-      const cfg = typeof window !== 'undefined' ? (() => { try { return JSON.parse(localStorage.getItem('sc_config') || 'null') } catch { return null } })() : null
-      const clinicId = cfg?.clinic_id ?? null
+      const clinicId = Number(process.env.NEXT_PUBLIC_CLINIC_ID ?? 1)
       const finalCity    = form.ville    === 'Autre' ? form.ville_autre    : form.ville
       const finalCommune = form.commune  === 'Autre' ? form.commune_autre  : form.commune
       const finalQuartier= form.quartier === 'Autre' ? form.quartier_autre : form.quartier
@@ -771,5 +779,13 @@ export default function BookingPage() {
         </div>
       </div>
     </>
+  )
+}
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={null}>
+      <BookingInner />
+    </Suspense>
   )
 }
