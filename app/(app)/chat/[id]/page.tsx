@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { chatApi } from '@/lib/api'
 
 const ACC  = '#1D9E75'
 const ACC2 = '#0F6E56'
@@ -57,50 +58,21 @@ export default function ChatThreadPage() {
   const inputRef   = useRef<HTMLInputElement>(null)
   const pollRef    = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const getBase  = () => (typeof window !== 'undefined' && localStorage.getItem('sc_avion_url')) || 'http://localhost:8001'
-  const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('sc_token') : null
-
   const loadMessages = async (tid: number) => {
-    const token = getToken()
-    if (!token) return
-    const r = await fetch(`${getBase()}/api/v1/pwa/chat/threads/${tid}/messages`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
-    if (!r.ok) return
-    const list: Msg[] = await r.json()
-    setMessages(list)
-    // Marquer comme lus
-    fetch(`${getBase()}/api/v1/pwa/chat/threads/${tid}/read`, {
-      method: 'PATCH',
-      headers: { 'Authorization': `Bearer ${token}` },
-    }).catch(() => {})
+    try {
+      const list: Msg[] = await chatApi.getMessages(tid) as Msg[]
+      setMessages(list)
+      chatApi.markRead(tid).catch(() => {})
+    } catch { /* backend indisponible */ }
   }
 
   const ensureThread = async (): Promise<number | null> => {
-    const token = getToken()
-    if (!token) return null
-    const base = getBase()
-
-    // Récupérer les threads existants
-    const r = await fetch(`${base}/api/v1/pwa/chat/threads`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
-    if (r.ok) {
-      const list = await r.json()
+    try {
+      const list = await chatApi.getThreads()
       if (list.length > 0) return list[0].id
-    }
-
-    // Créer un premier thread si vide
-    const r2 = await fetch(`${base}/api/v1/pwa/chat/threads`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: '', subject: 'Votre clinique' }),
-    })
-    if (r2.ok) {
-      const t = await r2.json()
+      const t = await chatApi.createThread('Votre clinique', '')
       return t.id
-    }
-    return null
+    } catch { return null }
   }
 
   useEffect(() => {
@@ -144,7 +116,7 @@ export default function ChatThreadPage() {
 
   const send = async () => {
     if (!text.trim() || sending) return
-    const token = getToken()
+    const token = typeof window !== 'undefined' ? localStorage.getItem('sc_token') : null
     if (!token) { router.push('/login'); return }
 
     const tid = threadId ?? await ensureThread()
@@ -164,11 +136,7 @@ export default function ChatThreadPage() {
     setMessages(prev => [...prev, tempMsg])
 
     try {
-      await fetch(`${getBase()}/api/v1/pwa/chat/threads/${tid}/send`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content }),
-      })
+      await chatApi.send(tid, content)
       await loadMessages(tid)
     } catch {
       // garde le message optimiste

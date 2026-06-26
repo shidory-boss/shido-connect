@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { publicAppointmentApi } from '@/lib/api'
 
 const ACC = '#1D9E75'
 const ACC2 = '#0F6E56'
@@ -27,12 +28,7 @@ export default function DoctorsPage() {
   const load = async () => {
     setLoading(true); setError(false)
     try {
-      const base = (typeof window !== 'undefined' && localStorage.getItem('sc_avion_url'))
-        || process.env.NEXT_PUBLIC_AVION_API_URL
-        || 'http://localhost:8001'
-      const r = await fetch(`${base}/api/v1/appointments/public/doctors`)
-      if (!r.ok) throw new Error()
-      const list = await r.json()
+      const list = await publicAppointmentApi.getDoctors()
       setDoctors(Array.isArray(list) ? list : [])
     } catch { setError(true) } finally { setLoading(false) }
   }

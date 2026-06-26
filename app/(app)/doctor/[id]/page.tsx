@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { publicAppointmentApi } from '@/lib/api'
 
 const ACC = '#1D9E75'
 const ACC2 = '#0F6E56'
@@ -42,14 +43,9 @@ export default function DoctorDetailPage() {
     const load = async () => {
       setLoading(true); setError(false)
       try {
-        const base = (typeof window !== 'undefined' && localStorage.getItem('sc_avion_url'))
-          || process.env.NEXT_PUBLIC_AVION_API_URL
-          || 'http://localhost:8001'
-        const r = await fetch(`${base}/api/v1/appointments/public/doctors`)
-        if (!r.ok) throw new Error()
-        const list: Doctor[] = await r.json()
+        const list = await publicAppointmentApi.getDoctors()
         const found = list.find(d => String(d.id) === id)
-        if (found) setDoctor(found)
+        if (found) setDoctor(found as Doctor)
         else setError(true)
       } catch { setError(true) } finally { setLoading(false) }
     }

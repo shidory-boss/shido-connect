@@ -3,7 +3,11 @@
 const getBaseUrl = (): string => {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('sc_avion_url')
-    if (stored) return stored
+    const onLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    // En production, ignorer toute URL localhost stockée en localStorage
+    if (stored && (onLocalhost || (!stored.includes('localhost') && !stored.includes('127.0.0.1')))) {
+      return stored
+    }
   }
   return process.env.NEXT_PUBLIC_AVION_API_URL || 'http://localhost:8001'
 }

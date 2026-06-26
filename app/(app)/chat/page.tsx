@@ -59,13 +59,11 @@ export default function ChatPage() {
     if (!token) { setLoggedIn(false); return }
     setLoggedIn(true)
 
-    const base = localStorage.getItem('sc_avion_url') || 'http://localhost:8001'
-    fetch(`${base}/api/v1/pwa/chat/threads`, {
-      headers: { 'Authorization': `Bearer ${token}` },
+    import('@/lib/api').then(({ chatApi }) => {
+      chatApi.getThreads()
+        .then((list: RealThread[]) => { if (list.length > 0) setThread(list[0]) })
+        .catch(() => {})
     })
-      .then(r => r.ok ? r.json() : [])
-      .then((list: RealThread[]) => { if (list.length > 0) setThread(list[0]) })
-      .catch(() => {}) // backend indisponible — pas d'erreur affichée
   }, [])
 
   if (!mounted) return null

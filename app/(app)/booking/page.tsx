@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { publicAppointmentApi } from '@/lib/api'
 
 const ACC  = '#1D9E75'
 const ACC2 = '#0F6E56'
@@ -136,13 +137,9 @@ export default function BookingPage() {
     setCalendar(days)
     // Charger les vrais médecins depuis le backend
     const loadDoctors = async () => {
-      const baseUrl = (typeof window !== 'undefined' && localStorage.getItem('sc_avion_url')) || 'http://localhost:8001'
       try {
-        const r = await fetch(`${baseUrl}/api/v1/appointments/public/doctors`)
-        if (r.ok) {
-          const list = await r.json()
-          if (Array.isArray(list) && list.length > 0) setDoctors(list)
-        }
+        const list = await publicAppointmentApi.getDoctors()
+        if (Array.isArray(list) && list.length > 0) setDoctors(list)
       } catch { /* backend non joignable */ } finally {
         setDoctorsLoading(false)
       }
@@ -200,26 +197,19 @@ export default function BookingPage() {
       const finalCommune = form.commune  === 'Autre' ? form.commune_autre  : form.commune
       const finalQuartier= form.quartier === 'Autre' ? form.quartier_autre : form.quartier
 
-      const baseUrl2 = (typeof window !== 'undefined' && localStorage.getItem('sc_avion_url')) || 'http://localhost:8001'
-      const resp = await fetch(`${baseUrl2}/api/v1/appointments/public`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          patient_name:        `${form.first_name} ${form.last_name}`.trim(),
-          patient_phone:       form.phone,
-          doctor_id:           form.doctor_id,
-          reason:              form.motif,
-          scheduled_at:        scheduledAt,
-          clinic_id:           clinicId,
-          patient_blood_group: form.blood_group !== 'Inconnu' ? form.blood_group : undefined,
-          patient_insurance:   form.assurance || undefined,
-          patient_city:        finalCity || undefined,
-          patient_commune:     finalCommune || undefined,
-          patient_quartier:    finalQuartier || undefined,
-        }),
+      const result = await publicAppointmentApi.create({
+        patient_name:        `${form.first_name} ${form.last_name}`.trim(),
+        patient_phone:       form.phone,
+        doctor_id:           form.doctor_id,
+        reason:              form.motif,
+        scheduled_at:        scheduledAt,
+        clinic_id:           clinicId,
+        patient_blood_group: form.blood_group !== 'Inconnu' ? form.blood_group : undefined,
+        patient_insurance:   form.assurance || undefined,
+        patient_city:        finalCity || undefined,
+        patient_commune:     finalCommune || undefined,
+        patient_quartier:    finalQuartier || undefined,
       })
-      if (!resp.ok) { const e = await resp.json().catch(() => ({})); throw new Error(e.detail || `Erreur ${resp.status}`) }
-      const result = await resp.json()
 
       localStorage.setItem('sc_booking_data', JSON.stringify({
         ...form,
@@ -663,10 +653,9 @@ export default function BookingPage() {
                     <div style={{ fontSize:13, color:'#EF4444', fontWeight:700, marginBottom:12 }}>⚠️ Impossible de charger les médecins</div>
                     <button onClick={async () => {
                       setDoctorsLoading(true)
-                      const baseUrl = localStorage.getItem('sc_avion_url') || 'http://localhost:8001'
                       try {
-                        const r = await fetch(`${baseUrl}/api/v1/appointments/public/doctors`)
-                        if (r.ok) { const list = await r.json(); if (list.length > 0) setDoctors(list) }
+                        const list = await publicAppointmentApi.getDoctors()
+                        if (list.length > 0) setDoctors(list)
                       } catch { /* retry */ } finally { setDoctorsLoading(false) }
                     }} style={{ padding:'10px 20px', borderRadius:12, background:ACC, color:'#fff', border:'none', fontSize:13, fontWeight:700, cursor:'pointer' }}>
                       🔄 Réessayer
