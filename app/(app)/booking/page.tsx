@@ -118,6 +118,7 @@ export default function BookingPage() {
   const [doctorsLoading, setDoctorsLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const [dobStep, setDobStep] = useState<'day'|'month'|'year'|null>(null)
 
   useEffect(() => {
     const sc = localStorage.getItem('sc_patient')
@@ -380,55 +381,95 @@ export default function BookingPage() {
               </div>
               <div style={{ marginTop:12 }}>
                 <label style={lbl}>Date de naissance</label>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 2fr', gap:8 }}>
-                  <div>
-                    <div style={{ fontSize:10, color:'#94a3b8', fontWeight:700, marginBottom:4, textAlign:'center' }}>JOUR</div>
-                    <input
-                      id="dob-day"
-                      type="text" inputMode="numeric" pattern="[0-9]*"
-                      maxLength={2} placeholder="JJ"
-                      value={form.date_of_birth ? form.date_of_birth.split('-')[2] : ''}
-                      onChange={e => {
-                        const v = e.target.value.replace(/\D/g,'').slice(0,2)
-                        const [y,m] = form.date_of_birth ? form.date_of_birth.split('-') : ['','']
-                        set('date_of_birth', `${y||''}-${m||''}-${v}`)
-                        if (v.length === 2) document.getElementById('dob-month')?.focus()
-                      }}
-                      style={{ ...inp, textAlign:'center', fontSize:18, fontWeight:700 }}
-                    />
-                  </div>
-                  <div>
-                    <div style={{ fontSize:10, color:'#94a3b8', fontWeight:700, marginBottom:4, textAlign:'center' }}>MOIS</div>
-                    <input
-                      id="dob-month"
-                      type="text" inputMode="numeric" pattern="[0-9]*"
-                      maxLength={2} placeholder="MM"
-                      value={form.date_of_birth ? form.date_of_birth.split('-')[1] : ''}
-                      onChange={e => {
-                        const v = e.target.value.replace(/\D/g,'').slice(0,2)
-                        const [y,,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['','','']
-                        set('date_of_birth', `${y||''}-${v}-${d||''}`)
-                        if (v.length === 2) document.getElementById('dob-year')?.focus()
-                      }}
-                      style={{ ...inp, textAlign:'center', fontSize:18, fontWeight:700 }}
-                    />
-                  </div>
-                  <div>
-                    <div style={{ fontSize:10, color:'#94a3b8', fontWeight:700, marginBottom:4, textAlign:'center' }}>ANNÉE</div>
-                    <input
-                      id="dob-year"
-                      type="text" inputMode="numeric" pattern="[0-9]*"
-                      maxLength={4} placeholder="AAAA"
-                      value={form.date_of_birth ? form.date_of_birth.split('-')[0] : ''}
-                      onChange={e => {
-                        const v = e.target.value.replace(/\D/g,'').slice(0,4)
-                        const [,m,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['','','']
-                        set('date_of_birth', `${v}-${m||''}-${d||''}`)
-                      }}
-                      style={{ ...inp, textAlign:'center', fontSize:18, fontWeight:700 }}
-                    />
-                  </div>
+                {/* Affichage / bouton d'ouverture */}
+                <div onClick={() => setDobStep(dobStep ? null : 'day')}
+                  style={{ ...inp, cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center',
+                    color: form.date_of_birth && form.date_of_birth.replace(/-/g,'').length >= 8 ? '#0f172a' : '#94a3b8',
+                    userSelect:'none' }}>
+                  <span style={{ fontWeight:700 }}>
+                    {(() => {
+                      const [y,m,d] = (form.date_of_birth||'').split('-')
+                      const mois = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
+                      return (d && m && y && d!=='' && m!=='' && y.length===4)
+                        ? `${parseInt(d)} ${mois[parseInt(m)-1]} ${y}`
+                        : 'Sélectionner votre date de naissance'
+                    })()}
+                  </span>
+                  <span style={{ fontSize:18 }}>📅</span>
                 </div>
+                {/* Wizard Jour */}
+                {dobStep === 'day' && (
+                  <div style={{ marginTop:8, background:'#f8fafc', borderRadius:14, padding:14, border:'1.5px solid #e2e8f0' }}>
+                    <div style={{ fontSize:11, fontWeight:800, color:'var(--accent,#1D9E75)', marginBottom:12, textAlign:'center', letterSpacing:1 }}>JOUR</div>
+                    <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:6 }}>
+                      {Array.from({length:31},(_,i)=>i+1).map(d => {
+                        const cur = form.date_of_birth ? parseInt(form.date_of_birth.split('-')[2]||'0') : 0
+                        const sel = cur === d
+                        return (
+                          <button key={d} type="button" onClick={() => {
+                            const [y,m] = form.date_of_birth ? form.date_of_birth.split('-') : ['','']
+                            set('date_of_birth', `${y||''}-${m||''}-${String(d).padStart(2,'0')}`)
+                            setDobStep('month')
+                          }} style={{ padding:'10px 0', borderRadius:10, border:'none',
+                            background: sel ? 'var(--accent,#1D9E75)' : '#fff',
+                            color: sel ? '#fff' : '#0f172a',
+                            fontWeight:700, fontSize:14, cursor:'pointer',
+                            boxShadow:'0 1px 4px rgba(0,0,0,.08)' }}>{d}</button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+                {/* Wizard Mois */}
+                {dobStep === 'month' && (
+                  <div style={{ marginTop:8, background:'#f8fafc', borderRadius:14, padding:14, border:'1.5px solid #e2e8f0' }}>
+                    <div style={{ fontSize:11, fontWeight:800, color:'var(--accent,#1D9E75)', marginBottom:12, textAlign:'center', letterSpacing:1 }}>MOIS</div>
+                    <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8 }}>
+                      {['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'].map((m,i) => {
+                        const cur = form.date_of_birth ? parseInt(form.date_of_birth.split('-')[1]||'0') : 0
+                        const sel = cur === i+1
+                        return (
+                          <button key={i} type="button" onClick={() => {
+                            const [y,,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['','','']
+                            set('date_of_birth', `${y||''}-${String(i+1).padStart(2,'0')}-${d||''}`)
+                            setDobStep('year')
+                          }} style={{ padding:'13px 0', borderRadius:10, border:'none',
+                            background: sel ? 'var(--accent,#1D9E75)' : '#fff',
+                            color: sel ? '#fff' : '#0f172a',
+                            fontWeight:700, fontSize:15, cursor:'pointer',
+                            boxShadow:'0 1px 4px rgba(0,0,0,.08)' }}>{m}</button>
+                        )
+                      })}
+                    </div>
+                    <button type="button" onClick={() => setDobStep('day')}
+                      style={{ marginTop:10, background:'none', border:'none', color:'#94a3b8', fontSize:12, cursor:'pointer', width:'100%' }}>← Changer le jour</button>
+                  </div>
+                )}
+                {/* Wizard Année */}
+                {dobStep === 'year' && (
+                  <div style={{ marginTop:8, background:'#f8fafc', borderRadius:14, padding:14, border:'1.5px solid #e2e8f0' }}>
+                    <div style={{ fontSize:11, fontWeight:800, color:'var(--accent,#1D9E75)', marginBottom:12, textAlign:'center', letterSpacing:1 }}>ANNÉE</div>
+                    <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6, maxHeight:200, overflowY:'auto' }}>
+                      {Array.from({length:101},(_,i)=>2026-i).map(y => {
+                        const cur = form.date_of_birth ? parseInt(form.date_of_birth.split('-')[0]||'0') : 0
+                        const sel = cur === y
+                        return (
+                          <button key={y} type="button" onClick={() => {
+                            const [,m,d] = form.date_of_birth ? form.date_of_birth.split('-') : ['','','']
+                            set('date_of_birth', `${y}-${m||''}-${d||''}`)
+                            setDobStep(null)
+                          }} style={{ padding:'9px 0', borderRadius:10, border:'none',
+                            background: sel ? 'var(--accent,#1D9E75)' : '#fff',
+                            color: sel ? '#fff' : '#0f172a',
+                            fontWeight:700, fontSize:13, cursor:'pointer',
+                            boxShadow:'0 1px 4px rgba(0,0,0,.08)' }}>{y}</button>
+                        )
+                      })}
+                    </div>
+                    <button type="button" onClick={() => setDobStep('month')}
+                      style={{ marginTop:10, background:'none', border:'none', color:'#94a3b8', fontSize:12, cursor:'pointer', width:'100%' }}>← Changer le mois</button>
+                  </div>
+                )}
               </div>
               <div style={{ marginTop:12 }}>
                 <label style={lbl}>Genre</label>
