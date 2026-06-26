@@ -45,43 +45,7 @@ let finalConfig: NextConfig = {
   },
 };
 
-if (!isDev) {
-  const withPWA = require('next-pwa')({
-    dest: 'public',
-    register: true,
-    skipWaiting: true,
-    clientsClaim: true,
-    disable: false,
-    workboxOptions: {
-      skipWaiting: true,
-      clientsClaim: true,
-      // Changer ce nom force le navigateur à créer un nouveau SW et détruit l'ancien cache
-      cacheId: 'oria-care-v3',
-      // Les pages HTML sont toujours récupérées depuis le réseau (jamais depuis le cache)
-      // → garantit que les mises à jour Vercel sont visibles immédiatement
-      runtimeCaching: [
-        {
-          urlPattern: /^https:\/\/shido-connect\.vercel\.app\/.*/,
-          handler: 'NetworkFirst',
-          options: {
-            cacheName: 'oria-care-pages-v3',
-            networkTimeoutSeconds: 10,
-            expiration: { maxEntries: 32, maxAgeSeconds: 24 * 60 * 60 },
-            cacheableResponse: { statuses: [200] },
-          },
-        },
-        {
-          urlPattern: /\.(js|css|woff2?|png|jpg|svg|ico)(\?.*)?$/,
-          handler: 'StaleWhileRevalidate',
-          options: {
-            cacheName: 'oria-care-assets-v3',
-            expiration: { maxEntries: 128, maxAgeSeconds: 30 * 24 * 60 * 60 },
-          },
-        },
-      ],
-    },
-  });
-  finalConfig = withPWA(finalConfig);
-}
+// next-pwa désactivé — sw.js est géré manuellement (public/sw.js)
+// Le sw.js actuel est un kill switch qui se désinstalle sur tous les appareils
 
 export default finalConfig;
