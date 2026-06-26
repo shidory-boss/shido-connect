@@ -82,8 +82,8 @@ export default function CallPage() {
                 fontSize:52, marginBottom:16,
                 animation:'ringGlow 2s ease-in-out infinite',
               }}>👨‍⚕️</div>
-              <div style={{ fontSize:18, fontWeight:900, color:'#fff', textShadow:'0 2px 12px rgba(0,0,0,.3)' }}>Dr. Kouamé Shidory</div>
-              <div style={{ fontSize:12, color:'rgba(255,255,255,.7)', fontWeight:600, marginTop:4 }}>Neurologue</div>
+              <div style={{ fontSize:18, fontWeight:900, color:'#fff', textShadow:'0 2px 12px rgba(0,0,0,.3)' }}>Votre médecin</div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,.7)', fontWeight:600, marginTop:4 }}>Téléconsultation</div>
             </div>
 
             {/* Icône caméra si off */}

@@ -132,7 +132,7 @@ export default function PaymentPage() {
           <div style={{ background:'#fff', borderRadius:20, padding:'20px', marginBottom:20, border:'1.5px solid #e2e8f0', display:'flex', alignItems:'center', gap:14, boxShadow:'0 4px 16px rgba(0,0,0,.06)', animation:'slideUp .4s ease .05s both' }}>
             <div style={{ width:56,height:56,borderRadius:16,background:`linear-gradient(135deg,${ACC2},${ACC})`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:26,flexShrink:0,boxShadow:`0 6px 18px rgba(29,158,117,.3)` }}>🏥</div>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:12, color:'#64748b', fontWeight:700 }}>Consultation · Dr. Kouamé Shidory</div>
+              <div style={{ fontSize:12, color:'#64748b', fontWeight:700 }}>Consultation médicale</div>
               <div style={{ fontSize:26, fontWeight:900, color:'#0f172a' }}>25 000 FCFA</div>
             </div>
           </div>
