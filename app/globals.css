@@ -56,7 +56,7 @@
 html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
 
 body {
-  font-family: 'Josefin Sans', 'Nunito', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-nunito), var(--font-josefin), system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text-primary);
   line-height: 1.6;
@@ -64,7 +64,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Josefin Sans', 'Nunito', system-ui, sans-serif;
+  font-family: var(--font-josefin), var(--font-nunito), system-ui, sans-serif;
   letter-spacing: -0.3px;
 }
 
@@ -156,7 +156,7 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--app-bg, #F4F7FF);
   box-shadow: 0 0 80px rgba(0,0,0,0.45);
   overflow-x: hidden;
-  font-family: 'Josefin Sans', 'Nunito', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-nunito), var(--font-josefin), system-ui, -apple-system, sans-serif;
 }
 
 /* ── PAGE TRANSITIONS ── */

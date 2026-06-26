@@ -1,6 +1,21 @@
 import type { Metadata, Viewport } from 'next'
+import { Josefin_Sans, Nunito } from 'next/font/google'
 import './globals.css'
 import { PWAConfigProvider } from '@/core/PWAConfigContext'
+
+const josefinSans = Josefin_Sans({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  variable: '--font-josefin',
+  display: 'swap',
+})
+
+const nunito = Nunito({
+  subsets: ['latin'],
+  weight: ['400', '600', '700', '800', '900'],
+  variable: '--font-nunito',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Oria Care',
@@ -30,11 +45,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-title" content="Oria Care" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Oria Care" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
       </head>
-      <body>
+      <body className={`${nunito.variable} ${josefinSans.variable}`}>
         <PWAConfigProvider>
           {children}
         </PWAConfigProvider>
