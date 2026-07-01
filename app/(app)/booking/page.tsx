@@ -2,7 +2,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { publicAppointmentApi } from '@/lib/api'
+import { publicAppointmentApi, bookingApi } from '@/lib/api'
 
 const ACC  = '#1D9E75'
 const ACC2 = '#0F6E56'
@@ -200,24 +200,34 @@ function BookingInner() {
     try {
       const doctorObj = doctors.find(d => d.id === form.doctor_id)
       const doctorName = doctorObj ? `Dr. ${doctorObj.first_name} ${doctorObj.last_name}`.trim() : ''
-      const scheduledAt = form.rdv_date && form.rdv_time ? `${form.rdv_date}T${form.rdv_time}:00` : ''
-      const clinicId = Number(process.env.NEXT_PUBLIC_CLINIC_ID ?? 1)
       const finalCity    = form.ville    === 'Autre' ? form.ville_autre    : form.ville
       const finalCommune = form.commune  === 'Autre' ? form.commune_autre  : form.commune
       const finalQuartier= form.quartier === 'Autre' ? form.quartier_autre : form.quartier
+
+      const notes = [
+        form.email ? `Email: ${form.email}` : '',
+        form.date_of_birth ? `Naissance: ${form.date_of_birth}` : '',
+        form.gender ? `Sexe: ${form.gender}` : '',
+        finalCity ? `Ville: ${finalCity}${finalCommune ? ' / ' + finalCommune : ''}${finalQuartier ? ' / ' + finalQuartier : ''}` : '',
+        form.allergies.length ? `Allergies: ${form.allergies.join(', ')}` : '',
+        form.chronic_diseases.length ? `Maladies: ${form.chronic_diseases.join(', ')}` : '',
+        form.current_treatments ? `Traitements: ${form.current_treatments}` : '',
+        form.emergency_contact ? `Urgence: ${form.emergency_contact} — ${form.emergency_phone}` : '',
+      ].filter(Boolean).join('\n')
 
       const result = await publicAppointmentApi.create({
         patient_name:        `${form.first_name} ${form.last_name}`.trim(),
         patient_phone:       form.phone,
         doctor_id:           form.doctor_id,
         reason:              form.motif,
-        scheduled_at:        scheduledAt,
-        clinic_id:           clinicId,
+        scheduled_at:        `${form.rdv_date}T${form.rdv_time}:00`,
+        clinic_id:           Number(process.env.NEXT_PUBLIC_CLINIC_ID ?? 1),
         patient_blood_group: form.blood_group !== 'Inconnu' ? form.blood_group : undefined,
         patient_insurance:   form.assurance || undefined,
         patient_city:        finalCity || undefined,
         patient_commune:     finalCommune || undefined,
         patient_quartier:    finalQuartier || undefined,
+        notes:               notes || undefined,
       })
 
       localStorage.setItem('sc_booking_data', JSON.stringify({

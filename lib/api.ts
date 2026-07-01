@@ -115,6 +115,7 @@ export const publicAppointmentApi = {
     patient_city?: string
     patient_commune?: string
     patient_quartier?: string
+    notes?: string
   }) =>
     apiFetch<{ status: string; id: number }>(
       '/api/v1/appointments/public', { method: 'POST', body: data, public: true }
