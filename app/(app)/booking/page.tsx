@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { publicAppointmentApi, bookingApi } from '@/lib/api'
@@ -77,6 +77,7 @@ const STEPS = [
   { title:'Antécédents',  icon:'📋', desc:'Maladies & traitements' },
   { title:'Urgence',      icon:'🚨', desc:'Contact en cas d\'urgence' },
   { title:'Rendez-vous',  icon:'📅', desc:'Médecin, date & heure' },
+  { title:'Signature',    icon:'✍️',  desc:'Consentement & signature' },
 ]
 
 type Form = {
@@ -88,6 +89,7 @@ type Form = {
   chronic_diseases: string[]; current_treatments: string
   emergency_contact: string; emergency_phone: string
   motif: string; doctor_id: number | null; rdv_date: string; rdv_time: string
+  patient_signature: string
 }
 
 const EMPTY: Form = {
@@ -99,6 +101,7 @@ const EMPTY: Form = {
   chronic_diseases:[], current_treatments:'',
   emergency_contact:'', emergency_phone:'',
   motif:'', doctor_id:null, rdv_date:'', rdv_time:'',
+  patient_signature: '',
 }
 
 type Doctor = { id: number; first_name: string; last_name: string; specialite?: string; img?: string }
@@ -122,6 +125,50 @@ function BookingInner() {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [dobStep, setDobStep] = useState<'day'|'month'|'year'|null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const drawingRef = useRef(false)
+
+  const getPos = (e: React.TouchEvent | React.MouseEvent, canvas: HTMLCanvasElement) => {
+    const rect = canvas.getBoundingClientRect()
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    if ('touches' in e) {
+      return { x: (e.touches[0].clientX - rect.left) * scaleX, y: (e.touches[0].clientY - rect.top) * scaleY }
+    }
+    return { x: ((e as React.MouseEvent).clientX - rect.left) * scaleX, y: ((e as React.MouseEvent).clientY - rect.top) * scaleY }
+  }
+
+  const startDraw = (e: React.TouchEvent | React.MouseEvent) => {
+    const canvas = canvasRef.current; if (!canvas) return
+    drawingRef.current = true
+    const ctx = canvas.getContext('2d')!
+    const pos = getPos(e, canvas)
+    ctx.beginPath(); ctx.moveTo(pos.x, pos.y)
+    e.preventDefault()
+  }
+
+  const draw = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!drawingRef.current) return
+    const canvas = canvasRef.current; if (!canvas) return
+    const ctx = canvas.getContext('2d')!
+    ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#0F6E56'
+    const pos = getPos(e, canvas)
+    ctx.lineTo(pos.x, pos.y); ctx.stroke()
+    e.preventDefault()
+  }
+
+  const endDraw = () => {
+    if (!drawingRef.current) return
+    drawingRef.current = false
+    const canvas = canvasRef.current; if (!canvas) return
+    setForm(f => ({ ...f, patient_signature: canvas.toDataURL('image/png') }))
+  }
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current; if (!canvas) return
+    canvas.getContext('2d')!.clearRect(0, 0, canvas.width, canvas.height)
+    setForm(f => ({ ...f, patient_signature: '' }))
+  }
 
   useEffect(() => {
     const sc = localStorage.getItem('sc_patient')
@@ -189,6 +236,7 @@ function BookingInner() {
       isValidEmail(form.email)
     )
     if (step === 5) return !!form.motif && form.doctor_id !== null && !!form.rdv_date && !!form.rdv_time
+    if (step === 6) return !!form.patient_signature
     return true
   }
 
@@ -228,6 +276,7 @@ function BookingInner() {
         patient_commune:     finalCommune || undefined,
         patient_quartier:    finalQuartier || undefined,
         notes:               notes || undefined,
+        patient_signature:   form.patient_signature || undefined,
       })
 
       localStorage.setItem('sc_booking_data', JSON.stringify({
@@ -751,6 +800,59 @@ function BookingInner() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {step === 6 && (
+            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+
+              {/* Récap */}
+              <div style={cardStyle}>
+                {cardTitle(BLUE, '📋', 'Récapitulatif')}
+                {[
+                  ['Patient', `${form.first_name} ${form.last_name}`],
+                  ['Téléphone', form.phone],
+                  ['Médecin', doctors.find(d=>d.id===form.doctor_id) ? `Dr. ${doctors.find(d=>d.id===form.doctor_id)!.first_name} ${doctors.find(d=>d.id===form.doctor_id)!.last_name}` : '—'],
+                  ['Date', form.rdv_date ? fmtDate(form.rdv_date) : '—'],
+                  ['Heure', form.rdv_time || '—'],
+                  ['Motif', form.motif || '—'],
+                ].map(([k,v]) => (
+                  <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid #f1f5f9', fontSize:13 }}>
+                    <span style={{ fontWeight:700, color:'#64748b' }}>{k}</span>
+                    <span style={{ fontWeight:800, color:'#0f172a', textAlign:'right', maxWidth:'60%' }}>{v}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Canvas signature */}
+              <div style={cardStyle}>
+                {cardTitle(ACC, '✍️', 'Signature numérique')}
+                <div style={{ fontSize:12, color:'#64748b', fontWeight:600, marginBottom:12 }}>
+                  En signant, je confirme l'exactitude des informations fournies et consens à la prise en charge médicale.
+                </div>
+                <div style={{ position:'relative', borderRadius:14, overflow:'hidden', border:`2px solid ${form.patient_signature ? ACC : '#e2e8f0'}`, background:'#fafafa', touchAction:'none' }}>
+                  <canvas
+                    ref={canvasRef}
+                    width={700}
+                    height={220}
+                    style={{ display:'block', width:'100%', height:140, cursor:'crosshair' }}
+                    onMouseDown={startDraw} onMouseMove={draw} onMouseUp={endDraw} onMouseLeave={endDraw}
+                    onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={endDraw}
+                  />
+                  {!form.patient_signature && (
+                    <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none' }}>
+                      <span style={{ fontSize:13, color:'#cbd5e1', fontWeight:700 }}>Signez ici avec votre doigt</span>
+                    </div>
+                  )}
+                </div>
+                <button onClick={clearSignature} style={{ marginTop:10, padding:'8px 16px', borderRadius:10, border:`1.5px solid #e2e8f0`, background:'#fff', fontSize:12, fontWeight:700, color:'#64748b', cursor:'pointer' }}>
+                  🗑 Effacer et recommencer
+                </button>
+                {form.patient_signature && (
+                  <div style={{ marginTop:8, fontSize:11, fontWeight:800, color:ACC }}>✓ Signature enregistrée</div>
+                )}
+              </div>
+
             </div>
           )}
         </div>
