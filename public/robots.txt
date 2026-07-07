@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+
+# Bloquer toutes les routes applicatives (espace patient privé)
+Disallow: /home
+Disallow: /booking
+Disallow: /queue
+Disallow: /profil
+Disallow: /mon-espace
+Disallow: /chat
+Disallow: /records
+Disallow: /documents
+Disallow: /reminders
+Disallow: /notifications
+Disallow: /payment
+Disallow: /teleconsult
+Disallow: /doctors
+Disallow: /doctor/
+Disallow: /services/
+Disallow: /specialties
+Disallow: /login
+Disallow: /onboarding
+Disallow: /api/
+
+# Autoriser uniquement la vitrine publique
+Allow: /vitrine
