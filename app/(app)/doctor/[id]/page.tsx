@@ -19,16 +19,21 @@ const TIME_SLOTS = ['08:00','08:30','09:00','09:30','12:00','12:30','13:00','14:
 
 type Doctor = { id: number; first_name: string; last_name: string; specialite?: string; img?: string }
 
+const FALLBACK_DOCTORS: Doctor[] = [
+  { id:1, first_name:'Yanick',  last_name:'Oulaï',   specialite:'Directeur Médical' },
+  { id:2, first_name:'Franck',  last_name:'Kouamé',  specialite:'Médecin Spécialiste' },
+  { id:3, first_name:'Christy', last_name:'Onamon',  specialite:'Pédiatre & Obstétricienne' },
+]
+
 export default function DoctorDetailPage() {
   const params = useParams()
   const router = useRouter()
   const id = String(params?.id || '')
 
-  const [doctor, setDoctor] = useState<Doctor | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
+  const fallback = FALLBACK_DOCTORS.find(d => String(d.id) === id) || FALLBACK_DOCTORS[0] || null
+  const [doctor, setDoctor] = useState<Doctor | null>(fallback)
   const [mode, setMode] = useState<'presentiel'|'tele'>('presentiel')
-  const [days, setDays] = useState<Array<{label:string,num:number,active:boolean}>>([])
+  const [days, setDays] = useState<Array<{label:string;num:number;active:boolean}>>([])
   const [slot, setSlot] = useState('')
 
   useEffect(() => {
@@ -41,31 +46,20 @@ export default function DoctorDetailPage() {
 
   useEffect(() => {
     if (!id) return
-    const load = async () => {
-      setLoading(true); setError(false)
-      try {
-        const list = await publicAppointmentApi.getDoctors()
-        const found = list.find(d => String(d.id) === id)
-        if (found) setDoctor(found as Doctor)
-        else setError(true)
-      } catch { setError(true) } finally { setLoading(false) }
-    }
-    load()
+    publicAppointmentApi.getDoctors()
+      .then(list => {
+        if (Array.isArray(list) && list.length > 0) {
+          const found = list.find(d => String(d.id) === id)
+          if (found) setDoctor(found as Doctor)
+        }
+      })
+      .catch(() => {})
   }, [id])
 
   const photo = doctor ? (doctor.img || DOCTOR_PHOTOS[doctor.first_name] || null) : null
-  const name = doctor ? `Dr. ${doctor.first_name} ${doctor.last_name}` : ''
+  const name  = doctor ? `Dr. ${doctor.first_name} ${doctor.last_name}` : ''
 
-  if (loading) return (
-    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0faf6', fontFamily:'Nunito,sans-serif' }}>
-      <div style={{ textAlign:'center', color:'#94a3b8' }}>
-        <div style={{ fontSize:36, marginBottom:12 }}>⏳</div>
-        <div style={{ fontSize:14, fontWeight:700 }}>Chargement...</div>
-      </div>
-    </div>
-  )
-
-  if (error || !doctor) return (
+  if (!doctor) return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0faf6', fontFamily:'Nunito,sans-serif', padding:24 }}>
       <div style={{ textAlign:'center' }}>
         <div style={{ fontSize:36, marginBottom:12 }}>⚠️</div>
@@ -84,14 +78,14 @@ export default function DoctorDetailPage() {
         .slot-btn:hover{transform:translateY(-2px)}
       `}</style>
 
-      <div style={{ minHeight:'100vh', background:'#f0faf6', fontFamily:'Nunito,system-ui,sans-serif', paddingBottom:100 }}>
+      <div style={{ minHeight:'100vh', background:'#f0faf6', fontFamily:'Nunito,system-ui,sans-serif', paddingBottom:120 }}>
 
         {/* HERO */}
         <div style={{ background:`linear-gradient(160deg,${ACC2},${ACC})`, padding:'52px 20px 32px', position:'relative', overflow:'hidden', borderRadius:'0 0 32px 32px' }}>
           <div style={{ position:'absolute', top:'-40px', right:'-40px', width:200, height:200, borderRadius:'50%', background:'rgba(255,255,255,.1)', pointerEvents:'none' }} />
           <button onClick={() => router.back()} style={{ width:40,height:40,borderRadius:12,background:'rgba(255,255,255,.2)',border:'none',color:'#fff',fontSize:20,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:20 }}>←</button>
           <div style={{ textAlign:'center' }}>
-            <div style={{ width:100, height:100, borderRadius:'50%', overflow:'hidden', border:'3px solid rgba(255,255,255,.5)', margin:'0 auto 12px', boxShadow:'0 8px 32px rgba(0,0,0,.2)', background:'#e1f5ee' }}>
+            <div style={{ width:100, height:100, borderRadius:'50%', overflow:'hidden', border:'3px solid rgba(255,255,255,.5)', margin:'0 auto 12px', boxShadow:'0 8px 32px rgba(0,0,0,.2)', background:'#e1f5ee', position:'relative' }}>
               {photo
                 ? <Image src={photo} alt={doctor.first_name} fill sizes="100px" unoptimized={photo.startsWith('http')} style={{ objectFit:'cover', objectPosition:'top' }} />
                 : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:44 }}>👨‍⚕️</div>

@@ -5,6 +5,22 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useClinicConfig } from '@/lib/useClinicConfig'
 
+function AnimCard({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [vis, setVis] = useState(false)
+  useEffect(() => {
+    const el = ref.current; if (!el) return
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect() } }, { threshold: 0.12 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return (
+    <div ref={ref} style={{ opacity: vis ? 1 : 0, transform: vis ? 'none' : 'translateY(28px)', transition: `opacity .55s ease ${delay}s, transform .55s cubic-bezier(.22,1,.36,1) ${delay}s` }}>
+      {children}
+    </div>
+  )
+}
+
 const HERO_IMG  = '/images/Hero Principal.png'
 const TEAM_IMGS = [
   '/images/Docteurs/Docteur africain 600x800.png',
@@ -30,9 +46,9 @@ const SERVICES = [
 ]
 
 const TEAM = [
-  { name:'Dr. Yanick Oulaï',   role:'Directeur Médical',        img: TEAM_IMGS[0], quote:'"La confiance et l\'écoute sont au cœur de notre engagement envers chaque patient."' },
-  { name:'Dr. Franck Kouamé',  role:'Médecin Spécialiste',       img: TEAM_IMGS[1], quote:'"Notre équipe s\'engage à offrir des soins de pointe dans un environnement chaleureux."' },
-  { name:'Dr. Christy Onamon', role:'Pédiatre & Obstétricienne', img: TEAM_IMGS[2], quote:'"Chaque enfant mérite les meilleurs soins. C\'est notre mission quotidienne."' },
+  { id:1, name:'Dr. Yanick Oulaï',   role:'Directeur Médical',        img: TEAM_IMGS[0], quote:'"La confiance et l\'écoute sont au cœur de notre engagement envers chaque patient."' },
+  { id:2, name:'Dr. Franck Kouamé',  role:'Médecin Spécialiste',       img: TEAM_IMGS[1], quote:'"Notre équipe s\'engage à offrir des soins de pointe dans un environnement chaleureux."' },
+  { id:3, name:'Dr. Christy Onamon', role:'Pédiatre & Obstétricienne', img: TEAM_IMGS[2], quote:'"Chaque enfant mérite les meilleurs soins. C\'est notre mission quotidienne."' },
 ]
 
 const TESTIMONIALS = [
@@ -140,6 +156,7 @@ export default function HomePage() {
     <>
       <style>{`
         @keyframes heroFadeUp  { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:none} }
+        @keyframes heroReveal  { 0%{opacity:0;transform:translateY(36px)} 100%{opacity:1;transform:none} }
         @keyframes shimmerTxt  { 0%{background-position:200% center} 100%{background-position:-200% center} }
         @keyframes floatBadge  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
         @keyframes scaleIn     { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
@@ -199,7 +216,7 @@ export default function HomePage() {
           <img
             src={HERO_IMG}
             alt="Clinique"
-            style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top', transform:`scale(1.05) translateY(${scrollY * 0.15}px)`, transition:'transform .05s linear' }}
+            style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top', transform:`scale(1.05) translateY(${scrollY * 0.15}px)`, transition:'transform .05s linear', animation:'heroReveal 1.4s ease 0s both' }}
           />
           <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(10,22,40,.78) 55%,rgba(10,22,40,.97) 100%)' }} />
           <div style={{ position:'absolute', top:40, right:-40, width:200, height:200, borderRadius:'50%', background:`radial-gradient(circle,${acc}44,transparent)`, animation:'floatBadge 6s ease-in-out infinite' }} />
@@ -227,12 +244,12 @@ export default function HomePage() {
 
           {/* Contenu hero */}
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'0 22px 32px', zIndex:2 }}>
-            <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:`${acc}22`, backdropFilter:'blur(12px)', border:`1px solid ${acc}66`, borderRadius:20, padding:'6px 14px', marginBottom:14, width:'fit-content', animation:'floatBadge 3s ease-in-out infinite' }}>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:`${acc}22`, backdropFilter:'blur(12px)', border:`1px solid ${acc}66`, borderRadius:20, padding:'6px 14px', marginBottom:14, width:'fit-content', animation:'heroReveal 1s cubic-bezier(.22,1,.36,1) .8s both, floatBadge 3s ease-in-out 2s infinite' }}>
               <div style={{ width:7, height:7, borderRadius:'50%', background:'#4ade80', animation:'pulse 2s ease-in-out infinite' }} />
               <span style={{ fontSize:11, fontWeight:800, color:'#fff', letterSpacing:'.5px' }}>Ouvert maintenant — 7h à 20h</span>
             </div>
 
-            <div style={{ fontSize:30, fontWeight:900, color:'#fff', lineHeight:1.15, marginBottom:10, animation:'heroFadeUp .7s ease .1s both' }}>
+            <div style={{ fontSize:30, fontWeight:900, color:'#fff', lineHeight:1.15, marginBottom:10, animation:'heroReveal 1.1s cubic-bezier(.22,1,.36,1) 1.4s both' }}>
               Des soins<br/>
               <span style={{
                 background:`linear-gradient(90deg,${acc} 0%,#4ade80 50%,${acc} 100%) 200% center / 200% auto`,
@@ -242,11 +259,11 @@ export default function HomePage() {
               pour votre famille
             </div>
 
-            <div style={{ fontSize:13, color:'rgba(255,255,255,.75)', fontWeight:600, lineHeight:1.6, marginBottom:20, animation:'heroFadeUp .7s ease .2s both' }}>
+            <div style={{ fontSize:13, color:'rgba(255,255,255,.75)', fontWeight:600, lineHeight:1.6, marginBottom:20, animation:'heroReveal 1s cubic-bezier(.22,1,.36,1) 2s both' }}>
               {name} — Médecine générale et spécialisée à Abidjan.
             </div>
 
-            <div style={{ display:'flex', gap:10, marginBottom:0, animation:'heroFadeUp .7s ease .3s both' }}>
+            <div style={{ display:'flex', gap:10, marginBottom:0, animation:'heroReveal 1.1s cubic-bezier(.22,1,.36,1) 2.6s both' }}>
               <Link href="/booking" style={{ textDecoration:'none', flex:1 }}>
                 <button className="rdv-btn" style={{ width:'100%', padding:'13px', borderRadius:16, background:`linear-gradient(135deg,${acc2},${acc})`, border:'none', color:'#fff', fontSize:13, fontWeight:900, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:`0 10px 30px ${acc}55`, animation:'floatA 3s ease-in-out infinite' }}>
                   📅 Prendre RDV
@@ -360,17 +377,22 @@ export default function HomePage() {
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
             {TEAM.map((m, i) => (
-              <div key={i} className="team-card" style={{ background:'#fff', borderRadius:24, overflow:'hidden', boxShadow:'0 8px 28px rgba(0,0,0,.1)', display:'flex', animation:`slideRight .5s ease ${i*0.12+0.2}s both, cardPulse ${4+i*0.5}s ease-in-out ${i*0.8}s infinite` }}>
-                <div style={{ width:110, flexShrink:0, position:'relative', overflow:'hidden' }}>
-                  <Image src={m.img} alt={m.name} fill sizes="110px" style={{ objectFit:'cover' }} />
-                  <div className="team-overlay" style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${acc2}cc,${acc}cc)`, opacity:0, transition:'opacity .3s' }} />
-                </div>
-                <div style={{ flex:1, padding:'18px 16px' }}>
-                  <div style={{ fontSize:15, fontWeight:900, color:'#0f172a', marginBottom:3 }}>{m.name}</div>
-                  <div style={{ fontSize:11, fontWeight:800, color:acc, marginBottom:10, textTransform:'uppercase', letterSpacing:'.5px' }}>{m.role}</div>
-                  <div style={{ fontSize:12, color:'#64748b', fontWeight:600, lineHeight:1.55, fontStyle:'italic' }}>{m.quote}</div>
-                </div>
-              </div>
+              <AnimCard key={i} delay={i * 0.1}>
+                <Link href={`/doctor/${m.id}`} style={{ textDecoration:'none', display:'block' }}>
+                  <div className="team-card" style={{ background:'#fff', borderRadius:24, overflow:'hidden', boxShadow:'0 8px 28px rgba(0,0,0,.1)', display:'flex', animation:`cardPulse ${4+i*0.5}s ease-in-out ${i*0.8}s infinite` }}>
+                    <div style={{ width:110, flexShrink:0, position:'relative', overflow:'hidden' }}>
+                      <Image src={m.img} alt={m.name} fill sizes="110px" style={{ objectFit:'cover' }} />
+                      <div className="team-overlay" style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${acc2}cc,${acc}cc)`, opacity:0, transition:'opacity .3s' }} />
+                    </div>
+                    <div style={{ flex:1, padding:'18px 16px' }}>
+                      <div style={{ fontSize:15, fontWeight:900, color:'#0f172a', marginBottom:3 }}>{m.name}</div>
+                      <div style={{ fontSize:11, fontWeight:800, color:acc, marginBottom:10, textTransform:'uppercase', letterSpacing:'.5px' }}>{m.role}</div>
+                      <div style={{ fontSize:12, color:'#64748b', fontWeight:600, lineHeight:1.55, fontStyle:'italic' }}>{m.quote}</div>
+                      <div style={{ marginTop:10, fontSize:11, fontWeight:800, color:acc }}>Prendre RDV →</div>
+                    </div>
+                  </div>
+                </Link>
+              </AnimCard>
             ))}
           </div>
         </div>
@@ -411,20 +433,22 @@ export default function HomePage() {
             <div style={{ fontSize:22, fontWeight:900, color:'#0f172a' }}>Pourquoi nous<br/>choisir ?</div>
             <div style={{ width:48, height:3, background:`linear-gradient(90deg,${acc2},${acc})`, borderRadius:2, margin:'12px auto 0' }} />
           </div>
-          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
             {[
-              { icon:'🏆', title:'Excellence médicale',   desc:'Équipements modernes et médecins hautement qualifiés pour des diagnostics précis.', color:'#F59E0B' },
-              { icon:'🤝', title:'Soins personnalisés',   desc:'Chaque patient est unique. Nous adaptons chaque traitement à votre situation.', color:'#1D9E75' },
-              { icon:'📍', title:'Accessible à Abidjan',  desc:'Au cœur de la ville, parking disponible, accès facile en transport commun.', color:'#0B1D35' },
-              { icon:'💳', title:'Tarifs transparents',   desc:'Des tarifs clairs affichés, sans surprises. Paiement Mobile Money accepté.', color:'#8B5CF6' },
+              { icon:'🏆', title:'Excellence médicale',   desc:'Équipements modernes, diagnostics précis.', color:'#F59E0B' },
+              { icon:'🤝', title:'Soins personnalisés',   desc:'Traitement adapté à chaque patient.', color:'#1D9E75' },
+              { icon:'📍', title:'Accessible à Abidjan',  desc:'Parking disponible, transport facile.', color:'#0B1D35' },
+              { icon:'💳', title:'Tarifs transparents',   desc:'Mobile Money accepté, sans surprise.', color:'#8B5CF6' },
+              { icon:'🕐', title:'Urgences 24h/24',       desc:'Équipe médicale toujours disponible.', color:'#EF4444' },
+              { icon:'📱', title:'Suivi digital',          desc:'RDV, rappels et résultats sur mobile.', color:'#0EA5E9' },
             ].map((it, i) => (
-              <div key={i} style={{ background:'#fff', borderRadius:20, padding:'18px', display:'flex', gap:14, alignItems:'flex-start', boxShadow:'0 4px 16px rgba(0,0,0,.07)', border:`1px solid ${it.color}18` }}>
-                <div style={{ width:50, height:50, borderRadius:16, background:`${it.color}18`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, flexShrink:0 }}>{it.icon}</div>
-                <div>
-                  <div style={{ fontSize:14, fontWeight:900, color:'#0f172a', marginBottom:4 }}>{it.title}</div>
-                  <div style={{ fontSize:12, color:'#64748b', fontWeight:600, lineHeight:1.55 }}>{it.desc}</div>
+              <AnimCard key={i} delay={i * 0.07}>
+                <div style={{ background:'#fff', borderRadius:20, padding:'16px 14px', boxShadow:'0 4px 16px rgba(0,0,0,.07)', border:`1.5px solid ${it.color}20`, height:'100%' }}>
+                  <div style={{ width:44, height:44, borderRadius:14, background:`${it.color}18`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, marginBottom:10 }}>{it.icon}</div>
+                  <div style={{ fontSize:13, fontWeight:900, color:'#0f172a', marginBottom:4, lineHeight:1.3 }}>{it.title}</div>
+                  <div style={{ fontSize:11, color:'#64748b', fontWeight:600, lineHeight:1.55 }}>{it.desc}</div>
                 </div>
-              </div>
+              </AnimCard>
             ))}
           </div>
         </div>
@@ -462,8 +486,8 @@ export default function HomePage() {
               </Link>
             </div>
             <div style={{ marginTop:24, paddingTop:20, borderTop:'1px solid rgba(255,255,255,.1)', textAlign:'center' }}>
-              <div style={{ fontSize:13, fontWeight:800, color:'rgba(255,255,255,.8)' }}>Oria Care · {name}</div>
-              <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', fontWeight:600, marginTop:4 }}>Abidjan, Côte d&apos;Ivoire · Propulsé par Oria Care</div>
+              <div style={{ fontSize:13, fontWeight:800, color:'rgba(255,255,255,.8)' }}>{name}</div>
+              <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', fontWeight:600, marginTop:4 }}>Abidjan, Côte d&apos;Ivoire · Propulsé par ShidoOS</div>
             </div>
           </div>
         </div>

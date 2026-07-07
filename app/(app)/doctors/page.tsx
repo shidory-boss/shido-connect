@@ -17,24 +17,24 @@ const DOCTOR_PHOTOS: Record<string, string> = {
 
 type Doctor = { id: number; first_name: string; last_name: string; specialite?: string; img?: string }
 
+const FALLBACK_DOCTORS: Doctor[] = [
+  { id:1, first_name:'Yanick',  last_name:'Oulaï',   specialite:'Directeur Médical' },
+  { id:2, first_name:'Franck',  last_name:'Kouamé',  specialite:'Médecin Spécialiste' },
+  { id:3, first_name:'Christy', last_name:'Onamon',  specialite:'Pédiatre & Obstétricienne' },
+]
+
 const getPhoto = (d: Doctor) => d.img || DOCTOR_PHOTOS[d.first_name] || null
 
 export default function DoctorsPage() {
   const router = useRouter()
-  const [doctors, setDoctors] = useState<Doctor[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
+  const [doctors, setDoctors] = useState<Doctor[]>(FALLBACK_DOCTORS)
   const [search, setSearch] = useState('')
 
-  const load = async () => {
-    setLoading(true); setError(false)
-    try {
-      const list = await publicAppointmentApi.getDoctors()
-      setDoctors(Array.isArray(list) ? list : [])
-    } catch { setError(true) } finally { setLoading(false) }
-  }
-
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    publicAppointmentApi.getDoctors()
+      .then(list => { if (Array.isArray(list) && list.length > 0) setDoctors(list) })
+      .catch(() => {})
+  }, [])
 
   const filtered = doctors.filter(d =>
     `${d.first_name} ${d.last_name} ${d.specialite || ''}`.toLowerCase().includes(search.toLowerCase())
@@ -59,7 +59,7 @@ export default function DoctorsPage() {
             <div>
               <div style={{ fontSize:20, fontWeight:900, color:'#fff' }}>Nos Médecins</div>
               <div style={{ fontSize:11, color:'rgba(255,255,255,.7)', fontWeight:600 }}>
-                {loading ? 'Chargement...' : `${filtered.length} médecin${filtered.length > 1 ? 's' : ''} disponible${filtered.length > 1 ? 's' : ''}`}
+                {`${filtered.length} médecin${filtered.length > 1 ? 's' : ''} disponible${filtered.length > 1 ? 's' : ''}`}
               </div>
             </div>
           </div>
@@ -74,31 +74,14 @@ export default function DoctorsPage() {
 
         {/* CONTENU */}
         <div style={{ padding:'16px 20px' }}>
-          {loading && (
-            <div style={{ textAlign:'center', padding:'60px 20px', color:'#94a3b8' }}>
-              <div style={{ fontSize:36, marginBottom:12 }}>⏳</div>
-              <div style={{ fontSize:14, fontWeight:700 }}>Chargement des médecins...</div>
-            </div>
-          )}
-
-          {!loading && error && (
-            <div style={{ textAlign:'center', padding:'60px 20px' }}>
-              <div style={{ fontSize:36, marginBottom:12 }}>⚠️</div>
-              <div style={{ fontSize:14, fontWeight:700, color:'#ef4444', marginBottom:16 }}>Impossible de joindre le serveur</div>
-              <button onClick={load} style={{ padding:'12px 24px', borderRadius:14, background:`linear-gradient(135deg,${ACC2},${ACC})`, color:'#fff', border:'none', fontSize:14, fontWeight:800, cursor:'pointer' }}>
-                🔄 Réessayer
-              </button>
-            </div>
-          )}
-
-          {!loading && !error && filtered.length === 0 && search && (
+          {filtered.length === 0 && search && (
             <div style={{ textAlign:'center', padding:'60px 20px', color:'#94a3b8', fontSize:14, fontWeight:600 }}>
               <div style={{ fontSize:48, marginBottom:12 }}>🔍</div>
               Aucun médecin trouvé pour "{search}"
             </div>
           )}
 
-          {!loading && !error && (
+          {(
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
               {filtered.map((d, i) => {
                 const name = `Dr. ${d.first_name} ${d.last_name}`
