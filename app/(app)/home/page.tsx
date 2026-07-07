@@ -244,12 +244,12 @@ export default function HomePage() {
 
           {/* Contenu hero */}
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'0 22px 32px', zIndex:2 }}>
-            <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:`${acc}22`, backdropFilter:'blur(12px)', border:`1px solid ${acc}66`, borderRadius:20, padding:'6px 14px', marginBottom:14, width:'fit-content', animation:'heroReveal 1s cubic-bezier(.22,1,.36,1) .8s both, floatBadge 3s ease-in-out 2s infinite' }}>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:`${acc}22`, backdropFilter:'blur(12px)', border:`1px solid ${acc}66`, borderRadius:20, padding:'6px 14px', marginBottom:14, width:'fit-content', animation:'heroReveal 1s cubic-bezier(.22,1,.36,1) 2s both, floatBadge 3s ease-in-out 3.2s infinite' }}>
               <div style={{ width:7, height:7, borderRadius:'50%', background:'#4ade80', animation:'pulse 2s ease-in-out infinite' }} />
               <span style={{ fontSize:11, fontWeight:800, color:'#fff', letterSpacing:'.5px' }}>Ouvert maintenant — 7h à 20h</span>
             </div>
 
-            <div style={{ fontSize:30, fontWeight:900, color:'#fff', lineHeight:1.15, marginBottom:10, animation:'heroReveal 1.1s cubic-bezier(.22,1,.36,1) 1.4s both' }}>
+            <div style={{ fontSize:30, fontWeight:900, color:'#fff', lineHeight:1.15, marginBottom:10, animation:'heroReveal 1.1s cubic-bezier(.22,1,.36,1) 2.8s both' }}>
               Des soins<br/>
               <span style={{
                 background:`linear-gradient(90deg,${acc} 0%,#4ade80 50%,${acc} 100%) 200% center / 200% auto`,
@@ -259,11 +259,11 @@ export default function HomePage() {
               pour votre famille
             </div>
 
-            <div style={{ fontSize:13, color:'rgba(255,255,255,.75)', fontWeight:600, lineHeight:1.6, marginBottom:20, animation:'heroReveal 1s cubic-bezier(.22,1,.36,1) 2s both' }}>
+            <div style={{ fontSize:13, color:'rgba(255,255,255,.75)', fontWeight:600, lineHeight:1.6, marginBottom:20, animation:'heroReveal 1s cubic-bezier(.22,1,.36,1) 3.5s both' }}>
               {name} — Médecine générale et spécialisée à Abidjan.
             </div>
 
-            <div style={{ display:'flex', gap:10, marginBottom:0, animation:'heroReveal 1.1s cubic-bezier(.22,1,.36,1) 2.6s both' }}>
+            <div style={{ display:'flex', gap:10, marginBottom:0, animation:'heroReveal 1.1s cubic-bezier(.22,1,.36,1) 4.2s both' }}>
               <Link href="/booking" style={{ textDecoration:'none', flex:1 }}>
                 <button className="rdv-btn" style={{ width:'100%', padding:'13px', borderRadius:16, background:`linear-gradient(135deg,${acc2},${acc})`, border:'none', color:'#fff', fontSize:13, fontWeight:900, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:`0 10px 30px ${acc}55`, animation:'floatA 3s ease-in-out infinite' }}>
                   📅 Prendre RDV
