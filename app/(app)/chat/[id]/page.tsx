@@ -1,11 +1,12 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { chatApi } from '@/lib/api'
 
-const ACC  = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC  = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 type Msg = {
   id: number
@@ -56,6 +57,7 @@ export default function ChatThreadPage() {
   const [recording, setRecording] = useState(false)
   const bottomRef  = useRef<HTMLDivElement>(null)
   const inputRef   = useRef<HTMLInputElement>(null)
+  const wsRef      = useRef<WebSocket | null>(null)
   const pollRef    = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const loadMessages = async (tid: number) => {
@@ -75,6 +77,41 @@ export default function ChatThreadPage() {
     } catch { return null }
   }
 
+  const connectWS = (tid: number) => {
+    // Construire l'URL WebSocket depuis l'URL API HTTP(S)
+    const base = (process.env.NEXT_PUBLIC_MEDICAL_API || localStorage.getItem('sc_avion_url') || 'http://localhost:8000')
+      .replace(/^https/, 'wss').replace(/^http/, 'ws')
+    const token = localStorage.getItem('sc_token') || ''
+    const ws = new WebSocket(`${base}/api/v1/pwa/chat/ws/${tid}?token=${token}`)
+    wsRef.current = ws
+
+    ws.onmessage = (e) => {
+      try {
+        const msg: Msg = JSON.parse(e.data)
+        setMessages(prev => {
+          if (prev.find(m => m.id === msg.id)) return prev
+          return [...prev, msg]
+        })
+        chatApi.markRead(tid).catch(() => {})
+      } catch { /* message malformé */ }
+    }
+
+    ws.onerror = () => {
+      // Fallback polling si WS non supporté par le backend
+      if (!pollRef.current) {
+        pollRef.current = setInterval(() => loadMessages(tid), 5000)
+      }
+    }
+
+    ws.onclose = () => {
+      wsRef.current = null
+      // Reconnexion automatique après 3s si pas de polling actif
+      if (!pollRef.current) {
+        setTimeout(() => connectWS(tid), 3000)
+      }
+    }
+  }
+
   useEffect(() => {
     setMounted(true)
     if (isStatic && staticMeta) {
@@ -90,7 +127,6 @@ export default function ChatThreadPage() {
     const cfg = (() => { try { return JSON.parse(localStorage.getItem('sc_config') || 'null') } catch { return null } })()
     if (cfg?.clinic_name) setClinicName(cfg.clinic_name)
 
-    // Résoudre le thread ID (soit depuis l'URL si numérique, soit charger depuis API)
     const numId = parseInt(id)
     const resolved = !isNaN(numId) ? numId : null
 
@@ -99,13 +135,15 @@ export default function ChatThreadPage() {
       if (!tid) return
       setThreadId(tid)
       await loadMessages(tid)
-
-      // Polling toutes les 3 secondes
-      pollRef.current = setInterval(() => loadMessages(tid), 3000)
+      connectWS(tid)
     }
     init()
 
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+    return () => {
+      wsRef.current?.close()
+      wsRef.current = null
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
+    }
   }, [id])
 
   useEffect(() => {

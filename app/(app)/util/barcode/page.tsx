@@ -1,9 +1,10 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-const ACC = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 export default function BarcodePage() {
   const router = useRouter()
@@ -112,39 +113,39 @@ export default function BarcodePage() {
               <svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
                 <rect width="180" height="180" fill="white"/>
                 {/* Coin haut-gauche */}
-                <rect x="10" y="10" width="50" height="50" fill="#1D9E75" rx="4"/>
+                <rect x="10" y="10" width="50" height="50" fill="var(--accent)" rx="4"/>
                 <rect x="18" y="18" width="34" height="34" fill="white" rx="2"/>
-                <rect x="24" y="24" width="22" height="22" fill="#1D9E75" rx="2"/>
+                <rect x="24" y="24" width="22" height="22" fill="var(--accent)" rx="2"/>
                 {/* Coin haut-droit */}
-                <rect x="120" y="10" width="50" height="50" fill="#1D9E75" rx="4"/>
+                <rect x="120" y="10" width="50" height="50" fill="var(--accent)" rx="4"/>
                 <rect x="128" y="18" width="34" height="34" fill="white" rx="2"/>
-                <rect x="134" y="24" width="22" height="22" fill="#1D9E75" rx="2"/>
+                <rect x="134" y="24" width="22" height="22" fill="var(--accent)" rx="2"/>
                 {/* Coin bas-gauche */}
-                <rect x="10" y="120" width="50" height="50" fill="#1D9E75" rx="4"/>
+                <rect x="10" y="120" width="50" height="50" fill="var(--accent)" rx="4"/>
                 <rect x="18" y="128" width="34" height="34" fill="white" rx="2"/>
-                <rect x="24" y="134" width="22" height="22" fill="#1D9E75" rx="2"/>
+                <rect x="24" y="134" width="22" height="22" fill="var(--accent)" rx="2"/>
                 {/* Données centrales */}
-                <rect x="70" y="10" width="8" height="8" fill="#1D9E75"/>
-                <rect x="82" y="10" width="8" height="8" fill="#1D9E75"/>
-                <rect x="94" y="10" width="8" height="8" fill="#1D9E75"/>
-                <rect x="70" y="22" width="8" height="8" fill="#1D9E75"/>
-                <rect x="94" y="22" width="8" height="8" fill="#1D9E75"/>
-                <rect x="82" y="34" width="8" height="8" fill="#1D9E75"/>
-                <rect x="70" y="46" width="8" height="8" fill="#1D9E75"/>
-                <rect x="94" y="46" width="8" height="8" fill="#1D9E75"/>
-                <rect x="70" y="70" width="8" height="8" fill="#1D9E75"/>
-                <rect x="94" y="82" width="8" height="8" fill="#1D9E75"/>
-                <rect x="106" y="70" width="8" height="8" fill="#1D9E75"/>
-                <rect x="70" y="94" width="8" height="8" fill="#1D9E75"/>
-                <rect x="106" y="94" width="8" height="8" fill="#1D9E75"/>
-                <rect x="82" y="106" width="8" height="8" fill="#1D9E75"/>
-                <rect x="70" y="130" width="8" height="8" fill="#1D9E75"/>
-                <rect x="94" y="142" width="8" height="8" fill="#1D9E75"/>
-                <rect x="106" y="118" width="8" height="8" fill="#1D9E75"/>
-                <rect x="118" y="130" width="8" height="8" fill="#1D9E75"/>
+                <rect x="70" y="10" width="8" height="8" fill="var(--accent)"/>
+                <rect x="82" y="10" width="8" height="8" fill="var(--accent)"/>
+                <rect x="94" y="10" width="8" height="8" fill="var(--accent)"/>
+                <rect x="70" y="22" width="8" height="8" fill="var(--accent)"/>
+                <rect x="94" y="22" width="8" height="8" fill="var(--accent)"/>
+                <rect x="82" y="34" width="8" height="8" fill="var(--accent)"/>
+                <rect x="70" y="46" width="8" height="8" fill="var(--accent)"/>
+                <rect x="94" y="46" width="8" height="8" fill="var(--accent)"/>
+                <rect x="70" y="70" width="8" height="8" fill="var(--accent)"/>
+                <rect x="94" y="82" width="8" height="8" fill="var(--accent)"/>
+                <rect x="106" y="70" width="8" height="8" fill="var(--accent)"/>
+                <rect x="70" y="94" width="8" height="8" fill="var(--accent)"/>
+                <rect x="106" y="94" width="8" height="8" fill="var(--accent)"/>
+                <rect x="82" y="106" width="8" height="8" fill="var(--accent)"/>
+                <rect x="70" y="130" width="8" height="8" fill="var(--accent)"/>
+                <rect x="94" y="142" width="8" height="8" fill="var(--accent)"/>
+                <rect x="106" y="118" width="8" height="8" fill="var(--accent)"/>
+                <rect x="118" y="130" width="8" height="8" fill="var(--accent)"/>
                 {/* Croix centrale */}
                 <rect x="78" y="78" width="24" height="24" fill="white" rx="4"/>
-                <text x="90" y="94" textAnchor="middle" fontSize="10" fontWeight="900" fill="#1D9E75" fontFamily="Arial">✚</text>
+                <text x="90" y="94" textAnchor="middle" fontSize="10" fontWeight="900" fill="var(--accent)" fontFamily="Arial">✚</text>
               </svg>
             </div>
 

@@ -1,11 +1,12 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
-import { publicAppointmentApi } from '@/lib/api'
+import { publicAppointmentApi, bookingApi } from '@/lib/api'
 
-const ACC = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 const DOCTOR_PHOTOS: Record<string, string> = {
   'Yanick':  '/images/Docteurs/Docteur africain 600x800.png',
@@ -15,7 +16,7 @@ const DOCTOR_PHOTOS: Record<string, string> = {
 }
 
 const DAYS_FR = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
-const TIME_SLOTS = ['08:00','08:30','09:00','09:30','12:00','12:30','13:00','14:30','15:00','16:00','17:00','19:00']
+const FALLBACK_SLOTS = ['08:00','08:30','09:00','09:30','12:00','12:30','13:00','14:30','15:00','16:00','17:00','19:00']
 
 type Doctor = { id: number; first_name: string; last_name: string; specialite?: string; img?: string }
 
@@ -25,6 +26,10 @@ const FALLBACK_DOCTORS: Doctor[] = [
   { id:3, first_name:'Christy', last_name:'Onamon',  specialite:'Pédiatre & Obstétricienne' },
 ]
 
+function toISODate(d: Date) {
+  return d.toISOString().split('T')[0]
+}
+
 export default function DoctorDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -33,16 +38,29 @@ export default function DoctorDetailPage() {
   const fallback = FALLBACK_DOCTORS.find(d => String(d.id) === id) || FALLBACK_DOCTORS[0] || null
   const [doctor, setDoctor] = useState<Doctor | null>(fallback)
   const [mode, setMode] = useState<'presentiel'|'tele'>('presentiel')
-  const [days, setDays] = useState<Array<{label:string;num:number;active:boolean}>>([])
+  const [days, setDays] = useState<Array<{label:string;num:number;active:boolean;iso:string}>>([])
   const [slot, setSlot] = useState('')
+  const [slots, setSlots] = useState<string[]>(FALLBACK_SLOTS)
 
   useEffect(() => {
     const now = new Date()
-    setDays(Array.from({length:7}, (_,i) => {
+    const d0 = Array.from({length:7}, (_,i) => {
       const d = new Date(now); d.setDate(now.getDate() + i)
-      return { label:DAYS_FR[d.getDay()], num:d.getDate(), active:i===0 }
-    }))
+      return { label:DAYS_FR[d.getDay()], num:d.getDate(), active:i===0, iso:toISODate(d) }
+    })
+    setDays(d0)
+    fetchSlots(d0[0].iso)
   }, [])
+
+  const fetchSlots = (dateIso: string) => {
+    bookingApi.getSlots(dateIso, id ? Number(id) : undefined)
+      .then(res => {
+        const found = Array.isArray(res) ? res.find(r => r.date === dateIso) : null
+        if (found?.slots?.length) setSlots(found.slots)
+        else setSlots(FALLBACK_SLOTS)
+      })
+      .catch(() => setSlots(FALLBACK_SLOTS))
+  }
 
   useEffect(() => {
     if (!id) return
@@ -121,7 +139,11 @@ export default function DoctorDetailPage() {
             <div style={{ overflowX:'auto', scrollbarWidth:'none' }}>
               <div style={{ display:'flex', gap:10, width:'max-content' }}>
                 {days.map((d,i) => (
-                  <div key={i} onClick={() => setDays(ds => ds.map((x,j) => ({...x,active:j===i})))} style={{ width:52,height:68,borderRadius:16,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',cursor:'pointer', background: d.active ? `linear-gradient(135deg,${ACC2},${ACC})` : '#f8fafc', border: d.active ? 'none' : '1.5px solid #e2e8f0', boxShadow: d.active ? `0 8px 20px rgba(29,158,117,.4)` : 'none', transition:'all .2s' }}>
+                  <div key={i} onClick={() => {
+                    setDays(ds => ds.map((x,j) => ({...x,active:j===i})))
+                    setSlot('')
+                    fetchSlots(d.iso)
+                  }} style={{ width:52,height:68,borderRadius:16,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',cursor:'pointer', background: d.active ? `linear-gradient(135deg,${ACC2},${ACC})` : '#f8fafc', border: d.active ? 'none' : '1.5px solid #e2e8f0', boxShadow: d.active ? `0 8px 20px rgba(29,158,117,.4)` : 'none', transition:'all .2s' }}>
                     <div style={{ fontSize:10, fontWeight:700, color:d.active?'rgba(255,255,255,.8)':'#94a3b8', marginBottom:4 }}>{d.label}</div>
                     <div style={{ fontSize:18, fontWeight:900, color:d.active?'#fff':'#334155' }}>{d.num}</div>
                   </div>
@@ -134,7 +156,7 @@ export default function DoctorDetailPage() {
           <div style={{ background:'#fff', borderRadius:18, padding:'18px', marginBottom:16, border:'1.5px solid #e2e8f0', animation:'slideUp .4s ease .2s both' }}>
             <div style={{ fontSize:14, fontWeight:900, color:'#0f172a', marginBottom:12 }}>Créneaux disponibles</div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8 }}>
-              {TIME_SLOTS.map(s => (
+              {slots.map(s => (
                 <div key={s} className="slot-btn" onClick={() => setSlot(s)} style={{ padding:'11px 8px', borderRadius:12, textAlign:'center', border:`2px solid ${slot===s ? ACC : '#e2e8f0'}`, background: slot===s ? `linear-gradient(135deg,${ACC2},${ACC})` : '#f8fafc', fontSize:13, fontWeight:800, color: slot===s ? '#fff' : '#334155', boxShadow: slot===s ? `0 4px 14px rgba(29,158,117,.4)` : 'none', transition:'all .2s' }}>
                   {s}
                 </div>

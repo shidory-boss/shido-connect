@@ -7,9 +7,9 @@ import { clinicConfig } from '@/chassis.config'
 import { useClinicConfig } from '@/lib/useClinicConfig'
 
 /* ── Couleurs ── */
-const ACC  = '#1D9E75'
-const ACC2 = '#0F6E56'
-const GOLD = '#C9A84C'
+const ACC  = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
+const GOLD = 'var(--gold)'
 
 const HERO_IMG  = '/images/Hero Principal.png'
 const TEAM_IMGS = [
@@ -25,7 +25,7 @@ const CLIENT_IMGS = [
 ]
 
 const SERVICES = [
-  { icon:'🩺', label:'Consultation Générale',  color:'#1D9E75', dark:'#0F6E56' },
+  { icon:'🩺', label:'Consultation Générale',  color:'var(--accent)', dark:'var(--accent-dark)' },
   { icon:'🧪', label:'Analyses & Bilans',       color:'#F59E0B', dark:'#D97706' },
   { icon:'🩻', label:'Radiologie & Imagerie',   color:'#6366F1', dark:'#4338CA' },
   { icon:'👶', label:'Pédiatrie',               color:'#0B1D35', dark:'#060F1C' },
@@ -315,7 +315,7 @@ export default function VitrinePage() {
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
             {[
               { icon:'🏆', title:'Excellence médicale',    desc:'Équipements modernes et médecins hautement qualifiés pour des diagnostics précis.', color:'#F59E0B' },
-              { icon:'🤝', title:'Soins personnalisés',    desc:'Chaque patient est unique. Nous adaptons chaque traitement à votre situation.', color:'#1D9E75' },
+              { icon:'🤝', title:'Soins personnalisés',    desc:'Chaque patient est unique. Nous adaptons chaque traitement à votre situation.', color:'var(--accent)' },
               { icon:'📍', title:'Accessible à Abidjan',  desc:'Au cœur de la ville, parking disponible, accès facile en transport commun.', color:'#0B1D35' },
               { icon:'💳', title:'Tarifs transparents',   desc:'Des tarifs clairs affichés, sans surprises. Paiement Mobile Money accepté.', color:'#8B5CF6' },
             ].map((it, i) => (

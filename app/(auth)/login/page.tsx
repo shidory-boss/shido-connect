@@ -25,7 +25,7 @@ export default function LoginPage() {
   const [particles, setParticles] = useState<{ id:number; x:number; y:number; color:string }[]>([])
 
   const burstParticles = () => {
-    const colors = ['#4ade80','#a8edda','#fff','#1D9E75','#86efac']
+    const colors = ['#4ade80','#a8edda','#fff','var(--accent)','#86efac']
     const pts = Array.from({ length: 18 }, (_, i) => ({
       id: Date.now() + i,
       x: 40 + Math.random() * 20,
@@ -36,8 +36,8 @@ export default function LoginPage() {
     setTimeout(() => setParticles([]), 900)
   }
 
-  const acc  = config.primary_color   || '#1D9E75'
-  const acc2 = config.secondary_color || '#0F6E56'
+  const acc  = config.primary_color   || 'var(--accent)'
+  const acc2 = config.secondary_color || 'var(--accent-dark)'
 
   useEffect(() => { setMounted(true) }, [])
 

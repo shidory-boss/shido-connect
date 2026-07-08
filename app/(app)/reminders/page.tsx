@@ -1,9 +1,10 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-const ACC  = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC  = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 type ReminderTime = { id: string; time: string }
 type Reminder = {

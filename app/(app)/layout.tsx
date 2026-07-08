@@ -21,9 +21,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       const h = new Date().getHours()
       const isNight = h >= 19 || h < 6
       const isSunset = h === 18
-      let accent = '#1D9E75'
+      let accent = 'var(--accent)'
       let bg = '#f0faf6'
-      if (isNight)       { accent = '#0F6E56'; bg = '#0a1628' }
+      if (isNight)       { accent = 'var(--accent-dark)'; bg = '#0a1628' }
       else if (isSunset) { accent = '#16835f'; bg = '#0f2a1e' }
       document.documentElement.style.setProperty('--accent', accent)
       document.documentElement.style.setProperty('--bg-app', bg)

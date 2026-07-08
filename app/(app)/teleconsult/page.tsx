@@ -1,11 +1,12 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { publicAppointmentApi } from '@/lib/api'
 
-const ACC = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 const CRENEAUX = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00']
 

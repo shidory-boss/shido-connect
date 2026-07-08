@@ -1,11 +1,12 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-const ACC  = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC  = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 type RealThread = {
   id: number

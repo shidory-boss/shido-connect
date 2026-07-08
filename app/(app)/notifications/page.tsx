@@ -1,9 +1,10 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-const ACC = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 type Notif = { id:number; icon:string; title:string; body:string; time:string; read:boolean; color:string }
 

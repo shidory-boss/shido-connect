@@ -10,13 +10,13 @@ import { clinicConfig } from '@/chassis.config'
 const HERO_IMG  = '/images/Hero Principal.png'
 
 const SERVICES = [
-  { icon:'🩺', title:'Consultation Générale',  desc:'Bilan complet, diagnostic, ordonnance personnalisée.',          price:'5 000 FCFA',      img: '/images/Services/General Consultation mint green 800x800.png',          color:'#1D9E75', blue:false },
+  { icon:'🩺', title:'Consultation Générale',  desc:'Bilan complet, diagnostic, ordonnance personnalisée.',          price:'5 000 FCFA',      img: '/images/Services/General Consultation mint green 800x800.png',          color:'var(--accent)', blue:false },
   { icon:'👶', title:'Pédiatrie',               desc:'Soins enfants 0–16 ans, vaccinations et suivi de croissance.',  price:'6 000 FCFA',      img: '/images/Services/Pediatrie 800x800 style reference.png',                 color:'#0B1D35', blue:true  },
-  { icon:'❤️', title:'Cardiologie',             desc:'ECG, bilan cardiaque, suivi hypertension et arythmies.',       price:'12 000 FCFA',     img: '/images/Services/Cardiologie 800x800 style reference.png',               color:'#1D9E75', blue:false },
+  { icon:'❤️', title:'Cardiologie',             desc:'ECG, bilan cardiaque, suivi hypertension et arythmies.',       price:'12 000 FCFA',     img: '/images/Services/Cardiologie 800x800 style reference.png',               color:'var(--accent)', blue:false },
   { icon:'🧠', title:'Neurologie',              desc:'Céphalées, vertiges, épilepsie et bilan neurologique.',        price:'15 000 FCFA',     img: '/images/Services/Neurologie 800x800 style reference.png',                color:'#0B1D35', blue:true  },
-  { icon:'🧪', title:'Analyses Biologiques',    desc:'Bilan sanguin, glycémie, lipides, rénaux et hormonal.',        price:'dès 3 500 FCFA',  img: '/images/Services/Analyses and Reports 800x800 style reference.png',      color:'#1D9E75', blue:false },
+  { icon:'🧪', title:'Analyses Biologiques',    desc:'Bilan sanguin, glycémie, lipides, rénaux et hormonal.',        price:'dès 3 500 FCFA',  img: '/images/Services/Analyses and Reports 800x800 style reference.png',      color:'var(--accent)', blue:false },
   { icon:'🩻', title:'Radiologie & Imagerie',   desc:'Radio, échographie abdominale, obstétricale et pelvienne.',    price:'dès 8 000 FCFA',  img: '/images/Services/Radiologie et Imagerie 800x800 style reference.png',    color:'#0B1D35', blue:true  },
-  { icon:'🎥', title:'Téléconsultation',         desc:'Consultez votre médecin par vidéo 7j/7, où que vous soyez.',  price:'4 000 FCFA',      img: '/images/Services/Teleconsultation 800x800 style reference.png',          color:'#1D9E75', blue:false },
+  { icon:'🎥', title:'Téléconsultation',         desc:'Consultez votre médecin par vidéo 7j/7, où que vous soyez.',  price:'4 000 FCFA',      img: '/images/Services/Teleconsultation 800x800 style reference.png',          color:'var(--accent)', blue:false },
   { icon:'🚑', title:'Urgences 24h/24',         desc:'Service d\'urgences permanent. Intervention rapide garantie.',price:'8 000 FCFA',      img: '/images/Services/24-7 Emergency Room 800x800 style reference.png',       color:'#0B1D35', blue:true  },
 ]
 
@@ -37,9 +37,9 @@ const TESTIMONIALS = [
 ]
 
 const FEATURED = [
-  { img:'/images/Services/General Consultation mint green 800x800.png',       title:'Consultation & Suivi',      desc:'Nos médecins généralistes et spécialistes vous accompagnent à chaque étape de votre parcours de santé.',  tag:'Disponible aujourd\'hui', accent:'#1D9E75' },
+  { img:'/images/Services/General Consultation mint green 800x800.png',       title:'Consultation & Suivi',      desc:'Nos médecins généralistes et spécialistes vous accompagnent à chaque étape de votre parcours de santé.',  tag:'Disponible aujourd\'hui', accent:'var(--accent)' },
   { img:'/images/Services/Radiologie et Imagerie 800x800 style reference.png', title:'Imagerie Médicale',          desc:'Radio, échographie, scanner — équipements modernes pour un diagnostic précis et rapide.',                   tag:'Haute technologie',        accent:'#0B1D35' },
-  { img:'/images/Services/Teleconsultation 800x800 style reference.png',       title:'Téléconsultation',           desc:'Consultez depuis Abidjan, Bouaké ou n\'importe où en Côte d\'Ivoire par vidéo sécurisée.',                 tag:'Innovation numérique',     accent:'#1D9E75' },
+  { img:'/images/Services/Teleconsultation 800x800 style reference.png',       title:'Téléconsultation',           desc:'Consultez depuis Abidjan, Bouaké ou n\'importe où en Côte d\'Ivoire par vidéo sécurisée.',                 tag:'Innovation numérique',     accent:'var(--accent)' },
   { img:'/images/Services/Hospitalisation 800x800 style reference.png',        title:'Urgences & Hospitalisation', desc:'Une équipe médicale disponible 24h/24 pour vous prendre en charge rapidement et efficacement.',             tag:'24h / 7j',                 accent:'#0B1D35' },
 ]
 
@@ -53,8 +53,8 @@ export default function VitrineServicesPage() {
     return () => clearInterval(t)
   }, [])
 
-  const acc  = config?.primary_color   || '#1D9E75'
-  const acc2 = config?.secondary_color || '#0F6E56'
+  const acc  = config?.primary_color   || 'var(--accent)'
+  const acc2 = config?.secondary_color || 'var(--accent-dark)'
   const BLUE = '#0B1D35'
   const BLUE2 = '#060F1C'
 

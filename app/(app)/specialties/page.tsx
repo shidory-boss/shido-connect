@@ -1,8 +1,9 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useRouter } from 'next/navigation'
 
-const ACC = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 const SPECS = [
   { icon:'🧠', name:'Neurologie', count:'2 médecins', color:'#0B1D35', bg:'##E8EDF5' },

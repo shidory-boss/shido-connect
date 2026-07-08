@@ -36,13 +36,13 @@ const CLIENT_IMGS = [
 ]
 
 const SERVICES = [
-  { icon:'🩺', label:'Consultation Générale', slug:'consultation-generale', img:'/images/Services/General Consultation mint green 800x800.png',            color:'#1D9E75', dark:'#0F6E56' },
+  { icon:'🩺', label:'Consultation Générale', slug:'consultation-generale', img:'/images/Services/General Consultation mint green 800x800.png',            color:'var(--accent)', dark:'var(--accent-dark)' },
   { icon:'🧪', label:'Analyses & Bilans',      slug:'analyses-bilans',       img:'/images/Services/Analyses and Reports 800x800 style reference.png',       color:'#0B1D35', dark:'#060F1C' },
-  { icon:'🩻', label:'Radiologie & Imagerie',  slug:'radiologie-imagerie',   img:'/images/Services/Radiologie et Imagerie 800x800 style reference.png',     color:'#1D9E75', dark:'#0F6E56' },
+  { icon:'🩻', label:'Radiologie & Imagerie',  slug:'radiologie-imagerie',   img:'/images/Services/Radiologie et Imagerie 800x800 style reference.png',     color:'var(--accent)', dark:'var(--accent-dark)' },
   { icon:'👶', label:'Pédiatrie',              slug:'pediatrie',             img:'/images/Services/Pediatrie 800x800 style reference.png',                  color:'#0B1D35', dark:'#060F1C' },
-  { icon:'❤️', label:'Cardiologie',            slug:'cardiologie',           img:'/images/Services/Cardiologie 800x800 style reference.png',                color:'#1D9E75', dark:'#0F6E56' },
+  { icon:'❤️', label:'Cardiologie',            slug:'cardiologie',           img:'/images/Services/Cardiologie 800x800 style reference.png',                color:'var(--accent)', dark:'var(--accent-dark)' },
   { icon:'🎥', label:'Téléconsultation',        slug:'teleconsultation',      img:'/images/Services/Teleconsultation 800x800 style reference.png',           color:'#0B1D35', dark:'#060F1C' },
-  { icon:'🏥', label:'Hospitalisation',         slug:'hospitalisation',       img:'/images/Services/Hospitalisation 800x800 style reference.png',            color:'#1D9E75', dark:'#0F6E56' },
+  { icon:'🏥', label:'Hospitalisation',         slug:'hospitalisation',       img:'/images/Services/Hospitalisation 800x800 style reference.png',            color:'var(--accent)', dark:'var(--accent-dark)' },
   { icon:'🚑', label:'Urgences 24h/24',        slug:'urgences',              img:'/images/Services/24-7 Emergency Room 800x800 style reference.png',        color:'#0B1D35', dark:'#060F1C' },
 ]
 
@@ -67,7 +67,7 @@ const STATS = [
 ]
 
 const QUICK_ACTIONS = [
-  { href:'/booking',    icon:'📅', label:'Prendre RDV',     color:'#1D9E75' },
+  { href:'/booking',    icon:'📅', label:'Prendre RDV',     color:'var(--accent)' },
   { href:'/queue',      icon:'🎫', label:'File d\'attente', color:'#0B1D35' },
   { href:'/teleconsult',icon:'🎥', label:'Téléconsult',     color:'#8B5CF6' },
   { href:'/reminders',  icon:'💊', label:'Rappels médocs',  color:'#F59E0B' },
@@ -149,8 +149,8 @@ export default function HomePage() {
     return () => clearInterval(t)
   }, [])
 
-  const acc  = config?.primary_color   || '#1D9E75'
-  const acc2 = config?.secondary_color || '#0F6E56'
+  const acc  = config?.primary_color   || 'var(--accent)'
+  const acc2 = config?.secondary_color || 'var(--accent-dark)'
   const name = config?.clinic_name     || clinicConfig.name
 
   return (
@@ -333,7 +333,7 @@ export default function HomePage() {
                   <div style={{ position:'absolute', top:10, left:10, width:34, height:34, borderRadius:10, background:'rgba(255,255,255,.2)', backdropFilter:'blur(8px)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}>{s.icon}</div>
                   <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'10px 12px' }}>
                     <div style={{ fontSize:11, fontWeight:900, color:'#fff', lineHeight:1.3 }}>{s.label}</div>
-                    <div style={{ fontSize:10, color:s.color === '#1D9E75' ? '#a8edda' : 'rgba(255,255,255,.7)', fontWeight:800, marginTop:3 }}>Voir →</div>
+                    <div style={{ fontSize:10, color:s.color === 'var(--accent)' ? '#a8edda' : 'rgba(255,255,255,.7)', fontWeight:800, marginTop:3 }}>Voir →</div>
                   </div>
                 </div>
               </Link>
@@ -437,7 +437,7 @@ export default function HomePage() {
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
             {[
               { icon:'🏆', title:'Excellence médicale',   desc:'Équipements modernes, diagnostics précis.', color:'#F59E0B' },
-              { icon:'🤝', title:'Soins personnalisés',   desc:'Traitement adapté à chaque patient.', color:'#1D9E75' },
+              { icon:'🤝', title:'Soins personnalisés',   desc:'Traitement adapté à chaque patient.', color:'var(--accent)' },
               { icon:'📍', title:'Accessible à Abidjan',  desc:'Parking disponible, transport facile.', color:'#0B1D35' },
               { icon:'💳', title:'Tarifs transparents',   desc:'Mobile Money accepté, sans surprise.', color:'#8B5CF6' },
               { icon:'🕐', title:'Urgences 24h/24',       desc:'Équipe médicale toujours disponible.', color:'#EF4444' },

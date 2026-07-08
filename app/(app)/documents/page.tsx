@@ -7,7 +7,7 @@ import { useClinicConfig } from '@/lib/useClinicConfig'
 interface Doc { id:number; type:'ordonnance'|'resultat'|'compte_rendu'|'autre'; title:string; date:string; url:string; read:boolean }
 
 const TYPE_LABELS: Record<string,{label:string,icon:string,color:string}> = {
-  ordonnance:    { label:'Ordonnance',    icon:'💊', color:'#1D9E75' },
+  ordonnance:    { label:'Ordonnance',    icon:'💊', color:'var(--accent)' },
   resultat:      { label:'Résultat',      icon:'🔬', color:'#7C3AED' },
   compte_rendu:  { label:'Compte-rendu',  icon:'📝', color:'#0891B2' },
   autre:         { label:'Document',      icon:'📄', color:'#64748b' },

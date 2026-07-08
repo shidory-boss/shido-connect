@@ -1,11 +1,12 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useState, useEffect, useRef, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { publicAppointmentApi, bookingApi } from '@/lib/api'
 
-const ACC  = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC  = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 const BLUE = '#0B1D35'
 const BLUE2 = '#060F1C'
 const HERO_IMG = '/images/Hero 2.png'
@@ -151,7 +152,7 @@ function BookingInner() {
     if (!drawingRef.current) return
     const canvas = canvasRef.current; if (!canvas) return
     const ctx = canvas.getContext('2d')!
-    ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#0F6E56'
+    ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = 'var(--accent-dark)'
     const pos = getPos(e, canvas)
     ctx.lineTo(pos.x, pos.y); ctx.stroke()
     e.preventDefault()

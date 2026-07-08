@@ -57,7 +57,7 @@ export default function ResetCache() {
           {status}
         </p>
         {done && (
-          <p style={{ color: '#1D9E75', fontSize: 13, marginTop: 12, fontWeight: 700 }}>
+          <p style={{ color: 'var(--accent)', fontSize: 13, marginTop: 12, fontWeight: 700 }}>
             Redirection vers l&apos;accueil...
           </p>
         )}

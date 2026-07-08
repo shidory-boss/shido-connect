@@ -1,12 +1,13 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { localAuth, type LocalPatient } from '@/lib/localAuth'
 
-const ACC = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 export default function ProfilPage() {
   const router = useRouter()

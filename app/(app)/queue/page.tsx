@@ -1,11 +1,12 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 
 import { useEffect, useState } from 'react'
 import { queueApi } from '@/lib/api'
 import type { QueueEntry } from '@/lib/types'
 
-const ACC  = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC  = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 export default function QueuePage() {
   const [entry, setEntry]       = useState<QueueEntry | null>(null)

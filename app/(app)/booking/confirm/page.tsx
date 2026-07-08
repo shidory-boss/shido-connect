@@ -1,11 +1,12 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-const ACC = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
-const CONFETTI_COLORS = ['#1D9E75','#34D399','#60A5FA','#F59E0B','#EC4899','#8B5CF6','#EF4444','#FBBF24']
+const CONFETTI_COLORS = ['var(--accent)','#34D399','#60A5FA','#F59E0B','#EC4899','#8B5CF6','#EF4444','#FBBF24']
 
 function Confetti() {
   const pieces = Array.from({ length: 48 }, (_, i) => i)

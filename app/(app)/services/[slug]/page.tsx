@@ -1,11 +1,12 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { use } from 'react'
 
-const ACC = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 const NAVY = '#0B1D35'
 const NAVY2 = '#060F1C'
 

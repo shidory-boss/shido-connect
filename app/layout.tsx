@@ -18,7 +18,7 @@ const nunito = Nunito({
 })
 
 const CLINIC_NAME = process.env.NEXT_PUBLIC_CLINIC_NAME || 'ShidoConnect'
-const ACCENT      = process.env.NEXT_PUBLIC_ACCENT_COLOR || '#1D9E75'
+const ACCENT      = process.env.NEXT_PUBLIC_ACCENT_COLOR || 'var(--accent)'
 
 export const metadata: Metadata = {
   title: CLINIC_NAME,

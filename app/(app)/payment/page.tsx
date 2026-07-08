@@ -1,9 +1,10 @@
 'use client'
+import { clinicConfig } from '@/chassis.config'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-const ACC = '#1D9E75'
-const ACC2 = '#0F6E56'
+const ACC = clinicConfig.accent
+const ACC2 = clinicConfig.accentDark
 
 const OPERATORS = [
   { key:'om', name:'Orange Money', emoji:'🟠', color:'#FF6600', bg:'#FFF3EC' },
