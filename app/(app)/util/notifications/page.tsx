@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 const MOCK_NOTIFICATIONS = [
-  { id: 1, title: 'Rappel RDV', body: 'Votre rendez-vous est demain à 10h00 avec Oria Care', time: 'Il y a 2h', icon: '📅' },
+  { id: 1, title: 'Rappel RDV', body: 'Votre rendez-vous est demain à 10h00 avec ShidoConnect', time: 'Il y a 2h', icon: '📅' },
   { id: 2, title: 'Résultat disponible', body: 'Votre bilan sanguin est prêt à télécharger', time: 'Il y a 5h', icon: '🔬' },
   { id: 3, title: 'Message du médecin', body: 'Dr. Yao vous a envoyé un message', time: 'Hier', icon: '💬' },
   { id: 4, title: 'Ordonnance renouvelée', body: 'Votre ordonnance a été renouvelée', time: 'Il y a 2j', icon: '💊' },
@@ -28,7 +28,7 @@ export default function NotificationsPage() {
 
   function sendTestNotification() {
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      new Notification('Test Oria Care', { body: 'Vos notifications fonctionnent !' })
+      new Notification('Test ShidoConnect', { body: 'Vos notifications fonctionnent !' })
     }
   }
 

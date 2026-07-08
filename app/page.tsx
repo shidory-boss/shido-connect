@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { clinicConfig } from '@/chassis.config'
 
 export default function SplashPage() {
   const router = useRouter()
@@ -118,7 +119,7 @@ export default function SplashPage() {
             backgroundClip:'text',
             animation:'shimmerName 4s linear infinite',
           }}>
-            Oria Care
+            {clinicConfig.name}
           </div>
           <div style={{ fontSize:12, color:'rgba(255,255,255,.65)', letterSpacing:7, textTransform:'uppercase', marginTop:5 }}>
             Votre santé

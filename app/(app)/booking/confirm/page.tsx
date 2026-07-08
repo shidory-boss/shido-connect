@@ -152,7 +152,7 @@ export default function BookingConfirmPage() {
             </div>
             {[
               { label:'Patient',  val:`${data.first_name || ''} ${data.last_name || ''}`.trim() || '—', icon:'👤' },
-              { label:'Médecin',  val:data.doctor_name || 'Oria Care',                                    icon:'👨‍⚕️' },
+              { label:'Médecin',  val:data.doctor_name || 'Non renseigné',                              icon:'👨‍⚕️' },
               { label:'Motif',    val:data.motif || 'Consultation générale',                             icon:'🩺' },
               { label:'Date',     val:fmtDate(data.rdv_date),                                            icon:'📅' },
               { label:'Heure',    val:data.rdv_time || '—',                                              icon:'🕐' },

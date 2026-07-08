@@ -3,8 +3,8 @@ import { MetadataRoute } from 'next'
 const BASE = process.env.NEXT_PUBLIC_AVION_API_URL || 'http://localhost:8001'
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
-  let name = 'Oria Care'
-  let shortName = 'Oria Care'
+  let name = process.env.NEXT_PUBLIC_CLINIC_NAME || 'ShidoConnect'
+  let shortName = process.env.NEXT_PUBLIC_CLINIC_NAME || 'ShidoConnect'
   let themeColor = '#1D9E75'
 
   try {

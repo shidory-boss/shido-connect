@@ -94,14 +94,14 @@ export default function WidgetHomePage() {
                 }} />
               ))}
             </div>
-            {/* Widget Oria Care */}
+            {/* Widget ShidoConnect */}
             <div style={{
               margin: '10px 8px 0',
               background: 'linear-gradient(135deg, var(--acc) 0%, #0066cc 100%)',
               borderRadius: 14, padding: '10px 12px',
               boxShadow: '0 4px 12px rgba(0,100,255,0.3)',
             }}>
-              <div style={{ fontSize: 9, color: '#fff', opacity: 0.8, marginBottom: 2 }}>Oria Care</div>
+              <div style={{ fontSize: 9, color: '#fff', opacity: 0.8, marginBottom: 2 }}>ShidoConnect</div>
               <div style={{ fontSize: 11, color: '#fff', fontWeight: 800 }}>📱 Accès rapide</div>
               <div style={{ fontSize: 9, color: '#fff', opacity: 0.8, marginTop: 4 }}>RDV · Messages · Résultats</div>
             </div>
@@ -144,7 +144,7 @@ export default function WidgetHomePage() {
           }}>
             <span style={{ fontSize: 24 }}>✅</span>
             <div style={{ fontWeight: 800, marginTop: 6 }}>Application installée !</div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>Oria Care est sur votre écran d'accueil</div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>ShidoConnect est sur votre écran d'accueil</div>
           </div>
         )}
 

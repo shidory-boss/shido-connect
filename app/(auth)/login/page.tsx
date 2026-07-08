@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { clinicConfig } from '@/chassis.config'
 import { authApi } from '@/lib/api'
 import { storage } from '@/lib/storage'
 import { usePWAConfig } from '@/core/PWAConfigContext'
@@ -217,7 +218,7 @@ export default function LoginPage() {
             </div>
 
             <h1 style={{ fontSize:26, fontWeight:900, color:'#fff', margin:'0 0 6px', letterSpacing:'-0.5px', textShadow:'0 2px 12px rgba(0,0,0,0.2)' }}>
-              {config.clinic_name || 'Oria Care'}
+              {config.clinic_name || clinicConfig.name}
             </h1>
             <p style={{ fontSize:14, color:'rgba(255,255,255,0.72)', margin:0, fontWeight:600 }}>
               {config.welcome_message || 'Votre espace santé personnel'}
@@ -343,7 +344,7 @@ export default function LoginPage() {
               fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.4)',
               letterSpacing:'1.5px', textTransform:'uppercase',
             }}>
-              Propulsé par Oria Care
+              Propulsé par ShidoOS
             </div>
           </div>
         </div>

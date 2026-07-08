@@ -24,7 +24,7 @@ const PROJECTS: Project[] = [
     description: 'Mise en place d\'un bloc opératoire de pointe pour les interventions cardiaques complexes.',
     longDescription: 'Notre programme de chirurgie cardiaque a été développé pour répondre aux besoins croissants de la région. Nous avons investi dans des équipements de dernière génération et formé une équipe pluridisciplinaire hautement spécialisée.',
     results: '150 interventions réussies, taux de réussite 98%, temps de récupération réduit de 30%.',
-    team: 'Oria Care (chirurgien), Dr. Bamba (anesthésiste), 4 infirmiers spécialisés',
+    team: 'Dr. Principal (chirurgien), Dr. Bamba (anesthésiste), 4 infirmiers spécialisés',
     gradient: 'linear-gradient(135deg, #ff6b6b, #ee5a24)',
   },
   {

@@ -15,7 +15,7 @@ export default function BarcodePage() {
     if (raw) setPatient(JSON.parse(raw))
   }, [])
 
-  const name = patient ? `${patient.first_name} ${patient.last_name}` : 'Patient Oria Care'
+  const name = patient ? `${patient.first_name} ${patient.last_name}` : 'Patient ShidoConnect'
   const initials = patient ? `${patient.first_name[0]}${patient.last_name[0]}`.toUpperCase() : 'PS'
   const patId = patient?.phone ? `SHD-2025-${patient.phone.slice(-4)}` : 'SHD-2025-0001'
 
@@ -75,7 +75,7 @@ export default function BarcodePage() {
               <div>
                 <div style={{ fontSize:18, fontWeight:900, color:'#fff' }}>{name}</div>
                 <div style={{ fontSize:11, color:'rgba(255,255,255,.7)', fontWeight:600 }}>{patId}</div>
-                <div style={{ fontSize:11, color:'rgba(255,255,255,.65)', fontWeight:600 }}>📍 Oria Care · Cocody</div>
+                <div style={{ fontSize:11, color:'rgba(255,255,255,.65)', fontWeight:600 }}>📍 ShidoConnect · Cocody</div>
               </div>
             </div>
 

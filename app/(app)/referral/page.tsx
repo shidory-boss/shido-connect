@@ -26,7 +26,7 @@ export default function ReferralPage() {
 
   const shareWhatsApp = () => {
     if (!code) return
-    const text = encodeURIComponent(`Rejoins-moi sur Oria Care avec mon code de parrainage : ${code}`)
+    const text = encodeURIComponent(`Rejoins-moi sur l'application santé avec mon code de parrainage : ${code}`)
     window.open(`https://wa.me/?text=${text}`, '_blank')
   }
 

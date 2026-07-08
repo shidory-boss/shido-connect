@@ -8,7 +8,7 @@ const SERVICES = [
 ]
 
 const UPCOMING = [
-  { icon: '📅', title: 'Consultation Oria Care', date: '25 juin 2026 — 09h00' },
+  { icon: '📅', title: 'Consultation médicale', date: '25 juin 2026 — 09h00' },
   { icon: '📅', title: 'Bilan sanguin', date: '27 juin 2026 — 07h30' },
   { icon: '📅', title: 'Suivi cardiologie', date: '02 juil. 2026 — 14h00' },
 ]

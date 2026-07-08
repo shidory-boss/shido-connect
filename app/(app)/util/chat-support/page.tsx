@@ -184,7 +184,7 @@ export default function ChatSupportPage() {
               background: 'var(--card)', borderRadius: 'var(--radius)',
               border: '1px solid var(--card-border)', padding: '14px 16px'
             }}>
-              <div style={{ fontSize: 14, marginBottom: 4 }}>🤖 <strong>Bot Oria Care</strong></div>
+              <div style={{ fontSize: 14, marginBottom: 4 }}>🤖 <strong>Assistant ShidoConnect</strong></div>
               <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
                 Choisissez un sujet pour obtenir une réponse rapide.
               </div>

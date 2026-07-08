@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useClinicConfig } from '@/lib/useClinicConfig'
+import { clinicConfig } from '@/chassis.config'
 
 function AnimCard({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -150,7 +151,7 @@ export default function HomePage() {
 
   const acc  = config?.primary_color   || '#1D9E75'
   const acc2 = config?.secondary_color || '#0F6E56'
-  const name = config?.clinic_name     || 'Oria Care'
+  const name = config?.clinic_name     || clinicConfig.name
 
   return (
     <>

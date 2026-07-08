@@ -330,8 +330,8 @@ export default function ProfilPage() {
           )}
 
           <div style={{ textAlign:'center', padding:'20px 0', animation:'slideUp .4s ease .3s both' }}>
-            <div style={{ fontSize:12, fontWeight:800, color:ACC }}>Oria Care</div>
-            <div style={{ fontSize:10, color:'#94a3b8', fontWeight:600, marginTop:2 }}>© 2026 Oria Care · Côte d&apos;Ivoire</div>
+            <div style={{ fontSize:12, fontWeight:800, color:ACC }}>ShidoConnect</div>
+            <div style={{ fontSize:10, color:'#94a3b8', fontWeight:600, marginTop:2 }}>© 2026 ShidoOS · Côte d&apos;Ivoire</div>
           </div>
         </div>
       </div>

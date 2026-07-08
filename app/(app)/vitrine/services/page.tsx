@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useClinicConfig } from '@/lib/useClinicConfig'
+import { clinicConfig } from '@/chassis.config'
 
 const HERO_IMG  = '/images/Hero Principal.png'
 
@@ -95,7 +96,7 @@ export default function VitrineServicesPage() {
             {/* Badge animé */}
             <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:`${acc}22`, backdropFilter:'blur(12px)', border:`1px solid ${acc}66`, borderRadius:20, padding:'6px 14px', marginBottom:16, width:'fit-content', animation:'floatBadge 3s ease-in-out infinite' }}>
               <div style={{ width:7, height:7, borderRadius:'50%', background:'#4ade80', animation:'pulse 2s ease-in-out infinite' }} />
-              <span style={{ fontSize:11, fontWeight:800, color:'#fff', letterSpacing:'.5px' }}>{config?.clinic_name || 'Oria Care'}</span>
+              <span style={{ fontSize:11, fontWeight:800, color:'#fff', letterSpacing:'.5px' }}>{config?.clinic_name || clinicConfig.name}</span>
             </div>
 
             <div style={{ fontSize:34, fontWeight:900, color:'#fff', lineHeight:1.1, marginBottom:12, animation:'heroFadeUp .7s ease .1s both' }}>

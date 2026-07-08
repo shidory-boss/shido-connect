@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { clinicConfig } from '@/chassis.config'
 import { useClinicConfig } from '@/lib/useClinicConfig'
 
 /* ── Couleurs ── */
@@ -35,7 +36,7 @@ const SERVICES = [
 ]
 
 const TEAM = [
-  { name:'Oria Care Aboubakar',  role:'Directeur Médical',       img: TEAM_IMGS[0], quote:'"La confiance et l\'écoute sont au cœur de notre engagement envers chaque patient."' },
+  { name:'Dr. Aboubakar Koné',   role:'Directeur Médical',       img: TEAM_IMGS[0], quote:'"La confiance et l\'écoute sont au cœur de notre engagement envers chaque patient."' },
   { name:'Dr. Coulibaly Fatou', role:'Médecin Spécialiste',      img: TEAM_IMGS[1], quote:'"Notre équipe s\'engage à offrir des soins de pointe dans un environnement chaleureux."' },
   { name:'Dr. Traoré Aminata',  role:'Pédiatre & Obstétricienne',img: TEAM_IMGS[2], quote:'"Chaque enfant mérite les meilleurs soins. C\'est notre mission quotidienne."' },
 ]
@@ -62,7 +63,7 @@ export default function VitrinePage() {
 
   const acc  = config?.primary_color   || ACC
   const acc2 = config?.secondary_color || ACC2
-  const name = config?.clinic_name     || 'Oria Care'
+  const name = config?.clinic_name     || clinicConfig.name
 
   useEffect(() => {
     const el = scrollRef.current
