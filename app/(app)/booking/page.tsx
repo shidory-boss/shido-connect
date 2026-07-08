@@ -171,7 +171,16 @@ function BookingInner() {
     setForm(f => ({ ...f, patient_signature: '' }))
   }
 
+  // Persistance sessionStorage — restaure le formulaire si l'utilisateur revient
   useEffect(() => {
+    const saved = sessionStorage.getItem('sc_booking_draft')
+    if (saved) {
+      try {
+        const { form: f, step: s } = JSON.parse(saved)
+        setForm(prev => ({ ...prev, ...f }))
+        if (typeof s === 'number' && s > 0 && s < 6) setStep(s)
+      } catch { /* ignore */ }
+    }
     const sc = localStorage.getItem('sc_patient')
     if (sc) {
       const p = JSON.parse(sc)
@@ -216,7 +225,11 @@ function BookingInner() {
       else if (k === 'email') v = sanitizeEmail(v)
       else v = sanitize(v)
     }
-    setForm(f => ({ ...f, [k]: v }))
+    setForm(f => {
+      const next = { ...f, [k]: v }
+      sessionStorage.setItem('sc_booking_draft', JSON.stringify({ form: next, step }))
+      return next
+    })
   }
 
   const toggleList = (k: 'allergies' | 'chronic_diseases', val: string) => {
@@ -226,7 +239,12 @@ function BookingInner() {
     })
   }
 
-  const isValidPhone = (p: string) => /^(\+?225)?[\s\-]?[0-9\s\-]{8,14}$/.test(p.trim())
+  // CI : 10 chiffres commençant par 0X ou +225 0X
+  const isValidPhone = (p: string) => {
+    const digits = p.replace(/[\s\-().+]/g, '')
+    if (digits.startsWith('225')) return /^225(0[0-9]{9})$/.test(digits)
+    return /^0[0-9]{9}$/.test(digits)
+  }
   const isValidEmail = (e: string) => !e || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
 
   const canNext = () => {
@@ -241,8 +259,15 @@ function BookingInner() {
     return true
   }
 
+  const lastSubmitRef = useRef(0)
+
   const next = async () => {
     if (step < STEPS.length - 1) { setStep(s => s + 1); return }
+
+    // Debounce — empêche double-soumission en moins de 3s
+    const now = Date.now()
+    if (now - lastSubmitRef.current < 3000) return
+    lastSubmitRef.current = now
 
     setSubmitting(true)
     setSubmitError('')
@@ -287,6 +312,7 @@ function BookingInner() {
         doctor_name:      doctorName,
         appointment_id:   result.id,
       }))
+      sessionStorage.removeItem('sc_booking_draft')
       router.push('/booking/confirm')
     } catch (e: any) {
       const msg = e.message || ''

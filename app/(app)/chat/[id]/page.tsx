@@ -58,6 +58,32 @@ export default function ChatThreadPage() {
   const bottomRef  = useRef<HTMLDivElement>(null)
   const inputRef   = useRef<HTMLInputElement>(null)
   const wsRef      = useRef<WebSocket | null>(null)
+  const srRef      = useRef<any>(null)
+
+  const startRecording = () => {
+    if (typeof window === 'undefined') return
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SR) return
+    const sr = new SR()
+    sr.lang = 'fr-FR'
+    sr.continuous = false
+    sr.interimResults = false
+    sr.onresult = (e: any) => {
+      const transcript: string = e.results[0]?.[0]?.transcript || ''
+      if (transcript) setText(prev => prev ? `${prev} ${transcript}` : transcript)
+    }
+    sr.onend = () => setRecording(false)
+    sr.onerror = () => setRecording(false)
+    srRef.current = sr
+    sr.start()
+    setRecording(true)
+  }
+
+  const stopRecording = () => {
+    srRef.current?.stop()
+    srRef.current = null
+    setRecording(false)
+  }
   const pollRef    = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const loadMessages = async (tid: number) => {
@@ -270,7 +296,7 @@ export default function ChatThreadPage() {
                   ➤
                 </button>
               ) : (
-                <button onPointerDown={() => setRecording(true)} onPointerUp={() => setRecording(false)} onPointerLeave={() => setRecording(false)} style={{ width:50, height:50, borderRadius:'50%', flexShrink:0, background: recording ? 'linear-gradient(135deg,#ef4444,#dc2626)' : `linear-gradient(135deg,${ACC2},${ACC})`, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow: recording ? '0 4px 20px rgba(239,68,68,.5)' : `0 4px 16px ${ACC}55`, animation: recording ? 'pulse 1s ease-in-out infinite' : 'none', transition:'background .2s,box-shadow .2s' }}>
+                <button onClick={() => recording ? stopRecording() : startRecording()} style={{ width:50, height:50, borderRadius:'50%', flexShrink:0, background: recording ? 'linear-gradient(135deg,#ef4444,#dc2626)' : `linear-gradient(135deg,${ACC2},${ACC})`, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow: recording ? '0 4px 20px rgba(239,68,68,.5)' : `0 4px 16px ${ACC}55`, animation: recording ? 'pulse 1s ease-in-out infinite' : 'none', transition:'background .2s,box-shadow .2s' }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <rect x="8" y="1" width="8" height="13" rx="4" fill="white" opacity=".95"/>
                     <path d="M5 10a7 7 0 0014 0" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity=".95"/>

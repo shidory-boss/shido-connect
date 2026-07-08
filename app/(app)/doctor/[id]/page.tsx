@@ -8,11 +8,10 @@ import { publicAppointmentApi, bookingApi } from '@/lib/api'
 const ACC = clinicConfig.accent
 const ACC2 = clinicConfig.accentDark
 
-const DOCTOR_PHOTOS: Record<string, string> = {
-  'Yanick':  '/images/Docteurs/Docteur africain 600x800.png',
-  'Franck':  '/images/Docteurs/Docteur africain final 600x800.png',
-  'Christy': '/images/Docteurs/Femme docteur 600x800 final.png',
-  'Jean':    '/images/Docteurs/Docteur africain final 600x800.png',
+const DOCTOR_PHOTOS: Record<number, string> = {
+  1: '/images/Docteurs/Docteur africain 600x800.png',
+  2: '/images/Docteurs/Docteur africain final 600x800.png',
+  3: '/images/Docteurs/Femme docteur 600x800 final.png',
 }
 
 const DAYS_FR = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
@@ -74,7 +73,7 @@ export default function DoctorDetailPage() {
       .catch(() => {})
   }, [id])
 
-  const photo = doctor ? (doctor.img || DOCTOR_PHOTOS[doctor.first_name] || null) : null
+  const photo = doctor ? (doctor.img || DOCTOR_PHOTOS[doctor.id] || null) : null
   const name  = doctor ? `Dr. ${doctor.first_name} ${doctor.last_name}` : ''
 
   if (!doctor) return (
