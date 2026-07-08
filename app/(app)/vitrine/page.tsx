@@ -369,8 +369,8 @@ export default function VitrinePage() {
             </div>
 
             <div style={{ marginTop:24, paddingTop:20, borderTop:'1px solid rgba(255,255,255,.1)', textAlign:'center' }}>
-              <div style={{ fontSize:13, fontWeight:800, color:'rgba(255,255,255,.8)' }}>Oria Care · {name}</div>
-              <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', fontWeight:600, marginTop:4 }}>Abidjan, Côte d&apos;Ivoire · Propulsé par Oria Care</div>
+              <div style={{ fontSize:13, fontWeight:800, color:'rgba(255,255,255,.8)' }}>{name}</div>
+              <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', fontWeight:600, marginTop:4 }}>Abidjan, Côte d&apos;Ivoire · Propulsé par ShidoOS</div>
             </div>
           </div>
         </div>

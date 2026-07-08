@@ -17,10 +17,13 @@ const nunito = Nunito({
   display: 'swap',
 })
 
+const CLINIC_NAME = process.env.NEXT_PUBLIC_CLINIC_NAME || 'ShidoConnect'
+const ACCENT      = process.env.NEXT_PUBLIC_ACCENT_COLOR || '#1D9E75'
+
 export const metadata: Metadata = {
-  title: 'Oria Care',
-  description: 'Votre espace santé personnalisé — Oria Care',
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Oria Care' },
+  title: CLINIC_NAME,
+  description: `Votre espace santé personnalisé — ${CLINIC_NAME}`,
+  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: CLINIC_NAME },
 }
 
 export const viewport: Viewport = {
@@ -28,7 +31,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#1D9E75',
+  themeColor: ACCENT,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -42,9 +45,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Oria Care" />
+        <meta name="apple-mobile-web-app-title" content={CLINIC_NAME} />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="application-name" content="Oria Care" />
+        <meta name="application-name" content={CLINIC_NAME} />
       </head>
       <body className={`${nunito.variable} ${josefinSans.variable}`}>
         <PWAConfigProvider>
