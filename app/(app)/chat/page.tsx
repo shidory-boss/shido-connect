@@ -1,9 +1,10 @@
 'use client'
 import { clinicConfig } from '@/chassis.config'
-
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+
+const LOGO = '/images/Logo Oria Care 512 par 512.png'
 
 const ACC  = clinicConfig.accent
 const ACC2 = clinicConfig.accentDark
@@ -80,18 +81,20 @@ export default function ChatPage() {
 
       <div style={{ minHeight:'100vh', background:'#f8fafc', fontFamily:'Nunito,system-ui,sans-serif', paddingBottom:100 }}>
 
-        {/* HERO */}
-        <div style={{ position:'relative', height:220, overflow:'hidden' }}>
-          <Image src="/images/Hero message.png" alt="Messages" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} priority />
-          <div style={{ position:'absolute', inset:0, background:`linear-gradient(160deg,rgba(6,15,28,.88) 0%,rgba(11,29,53,.7) 45%,${ACC2}CC 100%)` }} />
-          <div style={{ position:'absolute', top:'-30px', right:'-30px', width:160, height:160, borderRadius:'50%', background:`${ACC}22`, pointerEvents:'none' }} />
-          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'0 20px 16px' }}>
-            <div style={{ fontSize:11, fontWeight:800, color:'#a8edda', letterSpacing:'2px', textTransform:'uppercase', marginBottom:4 }}>Messagerie sécurisée</div>
-            <div style={{ fontSize:24, fontWeight:900, color:'#fff', lineHeight:1.2, marginBottom:12 }}>Messages</div>
-            <div style={{ background:'rgba(255,255,255,0.15)', backdropFilter:'blur(10px)', borderRadius:20, padding:'10px 16px', display:'flex', alignItems:'center', gap:10, border:'1px solid rgba(255,255,255,0.25)' }}>
-              <span style={{ fontSize:16, opacity:.7 }}>🔍</span>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher une conversation…" style={{ flex:1, background:'none', border:'none', outline:'none', fontSize:14, color:'#fff', fontFamily:'Nunito,system-ui,sans-serif', fontWeight:600 }} />
-            </div>
+        {/* HERO avec logo clinique */}
+        <div style={{ position:'relative', background:`linear-gradient(160deg,rgba(6,15,28,.96) 0%,rgba(11,29,53,.92) 45%,${ACC2}EE 100%)`, padding:'48px 20px 20px', display:'flex', flexDirection:'column', alignItems:'center', gap:0 }}>
+          <div style={{ position:'absolute', top:-30, right:-30, width:160, height:160, borderRadius:'50%', background:`${ACC}18`, pointerEvents:'none' }} />
+          <div style={{ position:'absolute', bottom:-20, left:-20, width:100, height:100, borderRadius:'50%', background:`${ACC}10`, pointerEvents:'none' }} />
+          {/* Logo clinique */}
+          <div style={{ width:72, height:72, borderRadius:'50%', border:`2.5px solid ${ACC}88`, overflow:'hidden', marginBottom:12, boxShadow:`0 0 0 6px ${ACC}22, 0 8px 32px rgba(0,0,0,.4)` }}>
+            <Image src={LOGO} alt="logo" width={72} height={72} style={{ objectFit:'cover', width:'100%', height:'100%' }} />
+          </div>
+          <div style={{ fontSize:11, fontWeight:800, color:'#a8edda', letterSpacing:'2px', textTransform:'uppercase', marginBottom:4 }}>Messagerie sécurisée</div>
+          <div style={{ fontSize:22, fontWeight:900, color:'#fff', lineHeight:1.2, marginBottom:16 }}>Messages</div>
+          {/* Barre de recherche */}
+          <div style={{ width:'100%', background:'rgba(255,255,255,0.12)', backdropFilter:'blur(10px)', borderRadius:20, padding:'10px 16px', display:'flex', alignItems:'center', gap:10, border:'1px solid rgba(255,255,255,0.2)' }}>
+            <span style={{ fontSize:16, opacity:.7 }}>🔍</span>
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher une conversation…" style={{ flex:1, background:'none', border:'none', outline:'none', fontSize:14, color:'#fff', fontFamily:'Nunito,system-ui,sans-serif', fontWeight:600 }} />
           </div>
         </div>
 
@@ -102,8 +105,8 @@ export default function ChatPage() {
             <Link href={`/chat/${thread?.id ?? 'new'}`} style={{ textDecoration:'none' }}>
               <div className="thread-row" style={{ display:'flex', alignItems:'center', gap:14, padding:'14px 20px', borderBottom:'1px solid #f1f5f9', cursor:'pointer', animation:'fadeIn .3s ease both' }}>
                 <div style={{ position:'relative', flexShrink:0 }}>
-                  <div style={{ width:54, height:54, borderRadius:'50%', background:`linear-gradient(135deg,${ACC}22,${ACC}55)`, border:`2px solid ${ACC}44`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:24 }}>
-                    🏥
+                  <div style={{ width:54, height:54, borderRadius:'50%', border:`2px solid ${ACC}66`, overflow:'hidden' }}>
+                    <Image src={LOGO} alt="logo" width={54} height={54} style={{ objectFit:'cover', width:'100%', height:'100%' }} />
                   </div>
                   <div style={{ position:'absolute', bottom:2, right:2, width:13, height:13, borderRadius:'50%', background:'#22c55e', border:'2.5px solid #fff' }} />
                 </div>

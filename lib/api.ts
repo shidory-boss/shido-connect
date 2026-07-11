@@ -9,7 +9,7 @@ const getBaseUrl = (): string => {
       return stored
     }
   }
-  return process.env.NEXT_PUBLIC_AVION_API_URL || 'http://localhost:8001'
+  return process.env.NEXT_PUBLIC_MEDICAL_API || process.env.NEXT_PUBLIC_AVION_API_URL || 'http://localhost:8001'
 }
 
 const getToken = (): string | null => {
@@ -158,7 +158,7 @@ export const chatApi = {
     }),
   createThread: (subject: string, first_message: string) =>
     apiFetch<import('./types').ChatThread>('/api/v1/pwa/chat/threads', {
-      method: 'POST', body: { subject, first_message }
+      method: 'POST', body: { subject, content: first_message || ' ', first_message }
     }),
   markRead: (threadId: number) =>
     apiFetch<void>(`/api/v1/pwa/chat/threads/${threadId}/read`, { method: 'PATCH' }),

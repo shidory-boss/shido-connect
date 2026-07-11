@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { localAuth, type LocalPatient } from '@/lib/localAuth'
+import { bookingApi } from '@/lib/api'
 
 const ACC = clinicConfig.accent
 const ACC2 = clinicConfig.accentDark
@@ -16,7 +17,16 @@ export default function ProfilPage() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState<Partial<LocalPatient>>({})
   const [saved, setSaved] = useState(false)
-  const [section, setSection] = useState<'menu' | 'sante' | 'urgence'>('menu')
+  const [section, setSection] = useState<'menu' | 'rdv' | 'sante' | 'urgence'>('menu')
+  const [rdvList, setRdvList] = useState<any[]>([])
+  const [rdvLoading, setRdvLoading] = useState(false)
+
+  useEffect(() => {
+    if (section === 'rdv') {
+      setRdvLoading(true)
+      bookingApi.getMyAppointments().then(list => setRdvList(list)).catch(() => {}).finally(() => setRdvLoading(false))
+    }
+  }, [section])
 
   useEffect(() => {
     setMounted(true)
@@ -150,9 +160,9 @@ export default function ProfilPage() {
         <div style={{ padding:'0 16px' }}>
 
           {/* NAV TABS */}
-          <div style={{ display:'flex', gap:8, margin:'16px 0', background:'#fff', borderRadius:18, padding:6, boxShadow:'0 4px 16px rgba(0,0,0,.06)', border:'1.5px solid #e2e8f0' }}>
-            {([['menu','📋 Menu'],['sante','❤️ Santé'],['urgence','🚨 Urgence']] as const).map(([k,label]) => (
-              <button key={k} onClick={() => { setSection(k); setEditing(false) }} style={{ flex:1, padding:'10px 6px', borderRadius:12, border:'none', fontSize:12, fontWeight:800, cursor:'pointer', background:section===k?`linear-gradient(135deg,${ACC2},${ACC})`:'transparent', color:section===k?'#fff':'#64748b', transition:'all .2s' }}>
+          <div style={{ display:'flex', gap:6, margin:'16px 0', background:'#fff', borderRadius:18, padding:5, boxShadow:'0 4px 16px rgba(0,0,0,.06)', border:'1.5px solid #e2e8f0' }}>
+            {([['menu','📋 Menu'],['rdv','📅 RDV'],['sante','❤️ Santé'],['urgence','🚨 Urgence']] as const).map(([k,label]) => (
+              <button key={k} onClick={() => { setSection(k); setEditing(false) }} style={{ flex:1, padding:'9px 4px', borderRadius:12, border:'none', fontSize:11, fontWeight:800, cursor:'pointer', background:section===k?`linear-gradient(135deg,${ACC2},${ACC})`:'transparent', color:section===k?'#fff':'#64748b', transition:'all .2s' }}>
                 {label}
               </button>
             ))}
@@ -226,6 +236,56 @@ export default function ProfilPage() {
                 </div>
               </div>
             </>
+          )}
+
+          {/* ── SECTION RDV ── */}
+          {section === 'rdv' && (
+            <div style={{ animation:'slideUp .3s ease both' }}>
+              <Link href="/booking" style={{ textDecoration:'none' }}>
+                <button style={{ width:'100%', padding:'14px', borderRadius:18, border:'none', background:`linear-gradient(135deg,${ACC2},${ACC})`, color:'#fff', fontSize:14, fontWeight:900, cursor:'pointer', marginBottom:14, boxShadow:`0 8px 24px rgba(29,158,117,.35)` }}>
+                  ➕ Prendre un nouveau rendez-vous
+                </button>
+              </Link>
+              {rdvLoading && (
+                <div style={{ textAlign:'center', padding:30, color:'#94a3b8', fontSize:13, fontWeight:700 }}>Chargement…</div>
+              )}
+              {!rdvLoading && rdvList.length === 0 && (
+                <div style={{ background:'#fff', borderRadius:20, padding:'28px 20px', textAlign:'center', border:'1.5px solid #e2e8f0', boxShadow:'0 4px 16px rgba(0,0,0,.06)' }}>
+                  <div style={{ fontSize:44, marginBottom:10 }}>📅</div>
+                  <div style={{ fontSize:14, fontWeight:800, color:'#0f172a', marginBottom:6 }}>Aucun rendez-vous</div>
+                  <div style={{ fontSize:12, color:'#94a3b8', fontWeight:600 }}>Prenez votre premier rendez-vous en ligne</div>
+                </div>
+              )}
+              {!rdvLoading && rdvList.map((rdv: any) => {
+                const statusColor = rdv.status === 'confirmed' ? '#10B981' : rdv.status === 'cancelled' ? '#EF4444' : '#F59E0B'
+                const statusLabel = rdv.status === 'confirmed' ? '✅ Confirmé' : rdv.status === 'cancelled' ? '❌ Annulé' : '⏳ En attente'
+                const dateStr = rdv.date ? new Date(rdv.date + 'T12:00').toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' }) : '—'
+                return (
+                  <div key={rdv.id} style={{ background:'#fff', borderRadius:18, padding:'16px 18px', marginBottom:10, border:'1.5px solid #e2e8f0', boxShadow:'0 4px 12px rgba(0,0,0,.05)' }}>
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
+                      <div style={{ fontSize:13, fontWeight:800, color:'#0f172a', textTransform:'capitalize' }}>{dateStr}</div>
+                      <span style={{ fontSize:11, fontWeight:800, color:statusColor, background:`${statusColor}15`, padding:'3px 10px', borderRadius:20 }}>{statusLabel}</span>
+                    </div>
+                    <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
+                      <span style={{ fontSize:16 }}>🕐</span>
+                      <span style={{ fontSize:13, fontWeight:700, color:'#475569' }}>{rdv.time || '—'}</span>
+                    </div>
+                    {rdv.doctor_name && (
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
+                        <span style={{ fontSize:16 }}>👨‍⚕️</span>
+                        <span style={{ fontSize:13, fontWeight:700, color:'#475569' }}>{rdv.doctor_name}</span>
+                      </div>
+                    )}
+                    {rdv.service && (
+                      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                        <span style={{ fontSize:16 }}>📋</span>
+                        <span style={{ fontSize:12, color:'#64748b', fontWeight:600 }}>{rdv.service}</span>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           )}
 
           {/* ── SECTION SANTÉ ── */}

@@ -46,22 +46,48 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
     try {
-      // Essaie le backend d'abord
       const res = await authApi.login(phone, password)
       storage.setToken(res.access_token)
       storage.setPatient(res.patient)
+      import('@/lib/pushNotifications').then(m => m.setupPushNotifications()).catch(() => {})
       burstParticles(); setTimeout(() => router.replace('/home'), 700)
-    } catch {
-      // Backend indisponible → auth locale
-      try {
-        const patient = localAuth.login(phone, password)
-        const token = localAuth.makeToken(phone)
-        storage.setToken(token)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        storage.setPatient(patient as any)
-        burstParticles(); setTimeout(() => router.replace('/home'), 700)
-      } catch (localErr: unknown) {
-        setError(localErr instanceof Error ? localErr.message : 'Identifiants incorrects')
+    } catch (err: unknown) {
+      const msg = (err as any)?.response?.data?.detail || (err as any)?.message || ''
+      const isAuthError = (err as any)?.response?.status === 401
+
+      if (isAuthError) {
+        // Mauvais identifiants — vérifier si compte local (migré depuis un autre appareil)
+        const localPatient = localAuth.getPatient(phone)
+        if (localPatient && localAuth.login(phone, password)) {
+          // Compte local existant → tenter de le migrer vers le backend silencieusement
+          try {
+            const res = await authApi.register({
+              first_name: localPatient.first_name,
+              last_name: localPatient.last_name,
+              phone,
+              password,
+            })
+            storage.setToken(res.access_token)
+            storage.setPatient(res.patient)
+            import('@/lib/pushNotifications').then(m => m.setupPushNotifications()).catch(() => {})
+            burstParticles(); setTimeout(() => router.replace('/home'), 700)
+            return
+          } catch { /* compte déjà migré ou autre erreur */ }
+        }
+        setError('Téléphone ou mot de passe incorrect')
+      } else {
+        // Réseau inaccessible → mode hors-ligne si compte local existe
+        try {
+          const patient = localAuth.login(phone, password)
+          const token = localAuth.makeToken(phone)
+          storage.setToken(token)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          storage.setPatient(patient as any)
+          setError('⚠️ Mode hors-ligne — certaines fonctionnalités sont limitées')
+          burstParticles(); setTimeout(() => router.replace('/home'), 1200)
+        } catch {
+          setError('Serveur inaccessible. Vérifiez votre connexion internet.')
+        }
       }
     } finally { setLoading(false) }
   }
@@ -71,20 +97,31 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
     try {
-      // Essaie le backend d'abord
       const res = await authApi.register({ first_name: firstName, last_name: lastName, phone, password })
       storage.setToken(res.access_token)
       storage.setPatient(res.patient)
+      import('@/lib/pushNotifications').then(m => m.setupPushNotifications()).catch(() => {})
       burstParticles(); setTimeout(() => router.replace('/home'), 800)
-    } catch {
-      // Backend indisponible → crée un compte local
+    } catch (err: unknown) {
+      const status = (err as any)?.response?.status
+      const detail = (err as any)?.response?.data?.detail || ''
+      if (status === 400 && detail.includes('déjà')) {
+        setError('Ce numéro est déjà enregistré. Connectez-vous.')
+        return
+      }
+      if (status) {
+        setError(detail || 'Erreur lors de la création du compte')
+        return
+      }
+      // Réseau inaccessible → compte local temporaire
       try {
         const patient = localAuth.register(phone, password, firstName, lastName)
         const token = localAuth.makeToken(phone)
         storage.setToken(token)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         storage.setPatient(patient as any)
-        burstParticles(); setTimeout(() => router.replace('/home'), 800)
+        setError('⚠️ Compte créé en mode hors-ligne. Reconnectez-vous en ligne pour l\'activer sur tous vos appareils.')
+        burstParticles(); setTimeout(() => router.replace('/home'), 1500)
       } catch (localErr: unknown) {
         setError(localErr instanceof Error ? localErr.message : "Erreur lors de la création du compte")
       }

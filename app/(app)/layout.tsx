@@ -13,6 +13,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {})
     }
+    // Activer les push notifications si le patient est déjà connecté
+    const token = localStorage.getItem('sc_token')
+    if (token) {
+      import('@/lib/pushNotifications').then(m => m.setupPushNotifications()).catch(() => {})
+    }
   }, [])
 
   // Transition jour/nuit douce — palette change selon l'heure
