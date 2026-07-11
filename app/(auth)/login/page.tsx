@@ -48,7 +48,11 @@ export default function LoginPage() {
     try {
       const res = await authApi.login(phone, password)
       storage.setToken(res.access_token)
-      storage.setPatient(res.patient)
+      // Préserver l'avatar si la réponse l'inclut
+      const patientToSave = res.patient?.avatar
+        ? res.patient
+        : { ...res.patient, avatar: storage.getPatient()?.avatar ?? null }
+      storage.setPatient(patientToSave)
       import('@/lib/pushNotifications').then(m => m.setupPushNotifications()).catch(() => {})
       burstParticles(); setTimeout(() => router.replace('/home'), 700)
     } catch (err: unknown) {

@@ -1,14 +1,14 @@
 'use client'
 import { clinicConfig } from '@/chassis.config'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { localAuth, type LocalPatient } from '@/lib/localAuth'
 import { bookingApi } from '@/lib/api'
 
-const ACC = clinicConfig.accent
-const ACC2 = clinicConfig.accentDark
+const ACC = clinicConfig.accent || '#1D9E75'
+const ACC2 = clinicConfig.accentDark || '#0F6E56'
 
 export default function ProfilPage() {
   const router = useRouter()
@@ -20,6 +20,11 @@ export default function ProfilPage() {
   const [section, setSection] = useState<'menu' | 'rdv' | 'sante' | 'urgence'>('menu')
   const [rdvList, setRdvList] = useState<any[]>([])
   const [rdvLoading, setRdvLoading] = useState(false)
+  const [notifStatus, setNotifStatus] = useState<'default' | 'granted' | 'denied' | 'unsupported'>('default')
+  const [notifLoading, setNotifLoading] = useState(false)
+  const [avatar, setAvatar] = useState<string | null>(null)
+  const [avatarLoading, setAvatarLoading] = useState(false)
+  const avatarRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (section === 'rdv') {
@@ -29,12 +34,66 @@ export default function ProfilPage() {
   }, [section])
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (!('Notification' in window)) setNotifStatus('unsupported')
+      else setNotifStatus(Notification.permission as any)
+    }
+  }, [])
+
+  const uploadAvatar = async (file: File) => {
+    setAvatarLoading(true)
+    const base = process.env.NEXT_PUBLIC_MEDICAL_API || 'https://api-oria.shidoos.com'
+    const token = localStorage.getItem('sc_token') || ''
+    const fd = new FormData()
+    fd.append('file', file)
+    try {
+      const res = await fetch(`${base}/api/v1/pwa/profile/avatar`, { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: fd })
+      if (res.ok) {
+        const data = await res.json()
+        const url = `${base}${data.url}`
+        setAvatar(url)
+        // Sauvegarder localement
+        const raw = localStorage.getItem('sc_patient')
+        if (raw) { const p = JSON.parse(raw); p.avatar = url; localStorage.setItem('sc_patient', JSON.stringify(p)) }
+      }
+    } catch { /* ignore */ }
+    setAvatarLoading(false)
+  }
+
+  const enableNotifications = async () => {
+    setNotifLoading(true)
+    try {
+      const { setupPushNotifications } = await import('@/lib/pushNotifications')
+      await setupPushNotifications()
+      setNotifStatus(Notification.permission as any)
+    } catch { /* ignore */ }
+    setNotifLoading(false)
+  }
+
+  useEffect(() => {
     setMounted(true)
     const raw = localStorage.getItem('sc_patient')
     if (raw) {
       const p = JSON.parse(raw) as LocalPatient
       setPatient(p)
       setForm(p)
+      if ((p as any).avatar) setAvatar((p as any).avatar)
+    }
+    // Charger le profil depuis l'API pour avoir l'avatar à jour
+    const token = localStorage.getItem('sc_token')
+    if (token) {
+      const base = process.env.NEXT_PUBLIC_MEDICAL_API || 'https://api-oria.shidoos.com'
+      fetch(`${base}/api/v1/pwa/profile/me`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data?.avatar) {
+            const url = data.avatar.startsWith('http') ? data.avatar : `${base}${data.avatar}`
+            setAvatar(url)
+            const s = localStorage.getItem('sc_patient')
+            if (s) { const p = JSON.parse(s); p.avatar = url; localStorage.setItem('sc_patient', JSON.stringify(p)) }
+          }
+        })
+        .catch(() => {})
     }
   }, [])
 
@@ -140,9 +199,16 @@ export default function ProfilPage() {
           <Image src="/images/Hero 2.png" alt="profil" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center top' }} priority />
           <div style={{ position:'absolute', inset:0, background:'linear-gradient(160deg,rgba(6,15,28,.82) 0%,rgba(11,29,53,.7) 40%,rgba(15,110,86,.75) 100%)' }} />
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end', paddingBottom:44, textAlign:'center' }}>
-            <div style={{ width:80,height:80,borderRadius:'50%',background:'rgba(255,255,255,.15)',border:'3px solid rgba(255,255,255,.35)',backdropFilter:'blur(10px)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,fontWeight:900,color:'#fff',marginBottom:12,animation:'glow 2.5s ease-in-out infinite' }}>
-              {initials}
+            <div style={{ position:'relative', width:80, height:80, marginBottom:12, cursor:'pointer' }} onClick={() => avatarRef.current?.click()}>
+              {avatar
+                ? <img src={avatar} alt="avatar" style={{ width:80, height:80, borderRadius:'50%', objectFit:'cover', border:'3px solid rgba(255,255,255,.7)' }} />
+                : <div style={{ width:80,height:80,borderRadius:'50%',background:'rgba(255,255,255,.15)',border:'3px solid rgba(255,255,255,.35)',backdropFilter:'blur(10px)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,fontWeight:900,color:'#fff',animation:'glow 2.5s ease-in-out infinite' }}>{initials}</div>
+              }
+              <div style={{ position:'absolute', bottom:2, right:2, width:24, height:24, borderRadius:'50%', background:ACC, display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, border:'2px solid #fff' }}>
+                {avatarLoading ? '⏳' : '📷'}
+              </div>
             </div>
+            <input ref={avatarRef} type="file" accept="image/*" style={{ display:'none' }} onChange={e => { const f = e.target.files?.[0]; if(f) uploadAvatar(f) }} />
             <div style={{ fontSize:22,fontWeight:900,background:'linear-gradient(90deg,#fff 30%,#a8edda 50%,#fff 70%) 0 0 / 200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text',animation:'shimmer 4s linear infinite' }}>
               {name}
             </div>
@@ -234,6 +300,35 @@ export default function ProfilPage() {
                   <div style={{ width:44,height:44,borderRadius:14,background:'#FFF0F0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20 }}>🔴</div>
                   <div style={{ flex:1, fontSize:14, fontWeight:700, color:'#EF4444' }}>Se déconnecter</div>
                 </div>
+              </div>
+
+              {/* ── Notifications push ── */}
+              <div style={{ background:'#fff', borderRadius:20, padding:'18px 18px', border:'1.5px solid #e2e8f0', boxShadow:'0 4px 16px rgba(0,0,0,.06)', marginTop:14 }}>
+                <div style={{ fontSize:13, fontWeight:800, color:'#0f172a', marginBottom:4 }}>🔔 Notifications push</div>
+                <div style={{ fontSize:12, color:'#64748b', fontWeight:600, marginBottom:14 }}>
+                  Recevez un message de votre clinique même quand l&apos;app est fermée.
+                </div>
+                {notifStatus === 'granted' ? (
+                  <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', background:'#f0faf6', borderRadius:12, border:'1.5px solid #1D9E75' }}>
+                    <span style={{ fontSize:18 }}>✅</span>
+                    <div style={{ fontSize:13, fontWeight:700, color:'#1D9E75' }}>Notifications activées</div>
+                  </div>
+                ) : notifStatus === 'denied' ? (
+                  <div style={{ padding:'10px 14px', background:'#FFF0F0', borderRadius:12, border:'1.5px solid #EF4444' }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:'#EF4444', marginBottom:4 }}>❌ Notifications bloquées</div>
+                    <div style={{ fontSize:11, color:'#64748b' }}>Allez dans les paramètres de votre navigateur → Autorisations → Notifications → Autoriser pour ce site.</div>
+                  </div>
+                ) : notifStatus === 'unsupported' ? (
+                  <div style={{ fontSize:12, color:'#94a3b8', fontStyle:'italic' }}>Non supporté par ce navigateur.</div>
+                ) : (
+                  <button
+                    onClick={enableNotifications}
+                    disabled={notifLoading}
+                    style={{ width:'100%', padding:'13px', borderRadius:14, border:'none', background:`linear-gradient(135deg,#1D9E75,#0F6E56)`, color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', opacity: notifLoading ? .7 : 1, boxShadow:'0 6px 20px rgba(29,158,117,.35)' }}
+                  >
+                    {notifLoading ? 'Activation…' : '🔔 Activer les notifications'}
+                  </button>
+                )}
               </div>
             </>
           )}

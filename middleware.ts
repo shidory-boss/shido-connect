@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // ── Rate limiting (mémoire par instance worker) ──────────────────────────────
 const rateLimitStore = new Map<string, { count: number; reset: number }>()
-const RATE_LIMIT   = 120   // requêtes max
+const RATE_LIMIT   = 600   // requêtes max (PWA charge ~40 assets/page)
 const RATE_WINDOW  = 60_000 // par minute (ms)
 
 // ── Patterns d'attaque à bloquer immédiatement ────────────────────────────────

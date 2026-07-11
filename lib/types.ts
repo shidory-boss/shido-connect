@@ -79,6 +79,7 @@ export interface Patient {
   gender?: 'M' | 'F'
   clinic_id: number
   avatar_url?: string
+  avatar?: string | null
 }
 
 export interface PatientAuth {

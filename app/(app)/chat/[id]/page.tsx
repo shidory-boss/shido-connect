@@ -5,8 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { chatApi, apiFetch } from '@/lib/api'
 
-const ACC  = clinicConfig.accent
-const ACC2 = clinicConfig.accentDark
+const ACC  = clinicConfig.accent  || '#1D9E75'
+const ACC2 = clinicConfig.accentDark || '#0F6E56'
 const LOGO = '/images/Logo Oria Care 512 par 512.png'
 
 type Msg = {
@@ -16,6 +16,66 @@ type Msg = {
   sender_name: string
   created_at: string | null
   attachment?: { type: string; label: string; url: string } | null
+}
+
+// ─── Lecteur audio style Telegram ─────────────────────────────
+const TG_BARS = [22,38,58,80,55,32,72,92,68,42,58,76,88,52,30,66,82,72,48,30,56,76,88,62,40,52,72,90,66,46,36,62,82,72,52,36,56,80,88,62,42,30,52,70,82]
+
+function WAAudioPlayer({ src, isMe }: { src: string; isMe: boolean }) {
+  const [playing, setPlaying] = useState(false)
+  const [current, setCurrent] = useState(0)
+  const [dur, setDur]         = useState(0)
+  const aRef = useRef<HTMLAudioElement>(null)
+
+  const toggle = () => {
+    const a = aRef.current; if (!a) return
+    if (playing) { a.pause(); setPlaying(false) }
+    else { a.play().catch(() => {}); setPlaying(true) }
+  }
+  const fmt = (s: number) => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(Math.floor(s%60)).padStart(2,'0')}`
+  const progress = dur > 0 ? current / dur : 0
+
+  // Couleurs Telegram : bulle verte = mes messages
+  const btnBg   = isMe ? 'rgba(255,255,255,.28)' : 'rgba(29,158,117,.15)'
+  const btnCol  = isMe ? '#fff' : '#1D9E75'
+  const barFill = isMe ? 'rgba(255,255,255,.95)' : '#1D9E75'
+  const barVoid = isMe ? 'rgba(255,255,255,.28)' : '#b8d8cc'
+  const durCol  = isMe ? 'rgba(255,255,255,.65)' : '#7a9e94'
+
+  return (
+    <div style={{ display:'flex', alignItems:'center', gap:10, minWidth:190, padding:'2px 0' }}>
+      <audio ref={aRef} src={src} style={{ display:'none' }}
+        onTimeUpdate={e => setCurrent((e.target as HTMLAudioElement).currentTime)}
+        onLoadedMetadata={e => setDur((e.target as HTMLAudioElement).duration)}
+        onEnded={() => { setPlaying(false); setCurrent(0) }} />
+
+      {/* Grand bouton play style Telegram */}
+      <button onClick={toggle} style={{ width:46, height:46, borderRadius:'50%', background:btnBg, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow: isMe ? 'none' : '0 2px 8px rgba(0,0,0,.12)', transition:'transform .1s', WebkitTapHighlightColor:'transparent' }}
+        onMouseDown={e => (e.currentTarget.style.transform='scale(.92)')}
+        onMouseUp={e => (e.currentTarget.style.transform='scale(1)')}
+        onTouchStart={e => (e.currentTarget.style.transform='scale(.92)')}
+        onTouchEnd={e => (e.currentTarget.style.transform='scale(1)')}>
+        {playing
+          ? <svg width="16" height="16" viewBox="0 0 16 16" fill={btnCol}><rect x="2" y="2" width="4" height="12" rx="1.5"/><rect x="10" y="2" width="4" height="12" rx="1.5"/></svg>
+          : <svg width="16" height="16" viewBox="0 0 16 16" fill={btnCol}><path d="M4 2.5l9 5.5-9 5.5V2.5z"/></svg>
+        }
+      </button>
+
+      <div style={{ flex:1, display:'flex', flexDirection:'column', gap:5 }}>
+        {/* Waveform dense */}
+        <div style={{ display:'flex', alignItems:'flex-end', gap:1, height:26 }}>
+          {TG_BARS.map((h, i) => (
+            <div key={i} style={{ flex:1, height:`${h}%`, borderRadius:2, background: (i/TG_BARS.length) < progress ? barFill : barVoid, transition:'background .06s' }} />
+          ))}
+        </div>
+        {/* Durée + point bleu */}
+        <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:10, fontWeight:700, color:durCol }}>
+          <span>{fmt(playing ? current : dur)}</span>
+          <span style={{ fontSize:7, color:'#4FC3F7' }}>●</span>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 // Canaux statiques read-only (rdv, résultats)
@@ -76,6 +136,9 @@ export default function ChatThreadPage() {
   const [recording,  setRecording]  = useState(false)
   const [audioBlob,  setAudioBlob]  = useState<Blob | null>(null)
   const [uploading,  setUploading]  = useState(false)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [lightbox,   setLightbox]   = useState<string | null>(null)
+  const [recTime,    setRecTime]    = useState(0)
   const bottomRef  = useRef<HTMLDivElement>(null)
   const inputRef   = useRef<HTMLInputElement>(null)
   const fileRef    = useRef<HTMLInputElement>(null)
@@ -85,6 +148,19 @@ export default function ChatThreadPage() {
   const audioChunks = useRef<Blob[]>([])
   const pollRef    = useRef<ReturnType<typeof setInterval> | null>(null)
   const prevCountRef = useRef(0)
+  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const recTimerRef  = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // ── Supprimer un message ────────────────────────────────────
+  const deleteMsg = async (msgId: number) => {
+    const base = process.env.NEXT_PUBLIC_MEDICAL_API || 'https://api-oria.shidoos.com'
+    const token = localStorage.getItem('sc_token') || ''
+    try {
+      await fetch(`${base}/api/v1/pwa/chat/messages/${msgId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
+      setMessages(prev => prev.filter(m => m.id !== msgId))
+    } catch { /* ignore */ }
+    setDeletingId(null)
+  }
 
   // ── Recording voix ──────────────────────────────────────────
   const startAudioRec = async () => {
@@ -95,16 +171,23 @@ export default function ChatThreadPage() {
       }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       audioChunks.current = []
-      const mr = new MediaRecorder(stream)
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+        : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4'
+        : ''
+      const mr = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
+      const recordedMime = mr.mimeType || mimeType || 'audio/webm'
       mr.ondataavailable = e => { if (e.data.size > 0) audioChunks.current.push(e.data) }
       mr.onstop = () => {
-        const blob = new Blob(audioChunks.current, { type: 'audio/webm' })
+        const blob = new Blob(audioChunks.current, { type: recordedMime })
         setAudioBlob(blob)
         stream.getTracks().forEach(t => t.stop())
       }
       mediaRef.current = mr
-      mr.start()
+      mr.start(100)
       setRecording(true)
+      setRecTime(0)
+      recTimerRef.current = setInterval(() => setRecTime(t => t + 1), 1000)
     } catch { /* micro refusé */ }
   }
 
@@ -112,6 +195,21 @@ export default function ChatThreadPage() {
     mediaRef.current?.stop()
     mediaRef.current = null
     setRecording(false)
+    if (recTimerRef.current) { clearInterval(recTimerRef.current); recTimerRef.current = null }
+  }
+
+  const cancelRec = () => {
+    if (mediaRef.current) {
+      mediaRef.current.ondataavailable = null
+      mediaRef.current.onstop = null
+      mediaRef.current.stop()
+      mediaRef.current = null
+    }
+    audioChunks.current = []
+    setRecording(false)
+    setAudioBlob(null)
+    if (recTimerRef.current) { clearInterval(recTimerRef.current); recTimerRef.current = null }
+    setRecTime(0)
   }
 
   // ── Charger messages ────────────────────────────────────────
@@ -227,8 +325,9 @@ export default function ChatThreadPage() {
     if (!tid) return
     if (!threadId) setThreadId(tid)
     setUploading(true)
+    const ext = audioBlob.type.includes('mp4') ? 'mp4' : audioBlob.type.includes('ogg') ? 'ogg' : 'webm'
     const fd = new FormData()
-    fd.append('file', audioBlob, 'voice.webm')
+    fd.append('file', audioBlob, `voice.${ext}`)
     fd.append('thread_id', String(tid))
     fd.append('type', 'audio')
     try {
@@ -310,27 +409,45 @@ export default function ChatThreadPage() {
         #chat-scroll { -ms-overflow-style:none; scrollbar-width:none; }
       `}</style>
 
-      <div style={{ position:'fixed', top:0, bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:420, display:'flex', flexDirection:'column', background:'#eef2f7', fontFamily:'Nunito,system-ui,sans-serif', zIndex:600 }}>
+      {/* Wallpaper Telegram — fond doux avec léger motif */}
+      <div style={{ position:'fixed', top:0, bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:420, display:'flex', flexDirection:'column', fontFamily:'Nunito,system-ui,sans-serif', zIndex:600,
+        background:`linear-gradient(160deg, #d4e8cc 0%, #bdd4b5 50%, #c8dcc0 100%)`,
+        backgroundImage:`radial-gradient(circle at 1.5px 1.5px, rgba(255,255,255,.22) 1px, transparent 0)`,
+        backgroundSize:'18px 18px',
+      }}>
 
-        {/* HEADER */}
-        <div style={{ background:`linear-gradient(135deg,${ACC2},${c})`, paddingTop:'env(safe-area-inset-top,44px)', padding:'44px 16px 12px', display:'flex', alignItems:'center', gap:12, boxShadow:'0 4px 20px rgba(0,0,0,.18)', flexShrink:0 }}>
-          <button onClick={() => router.push('/chat')} style={{ background:'rgba(255,255,255,.2)', border:'none', borderRadius:12, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', fontSize:16, cursor:'pointer', color:'#fff', flexShrink:0 }}>←</button>
-          <div style={{ width:42, height:42, borderRadius:'50%', background:'rgba(255,255,255,.15)', border:'2px solid rgba(255,255,255,.35)', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', flexShrink:0 }}>
+        {/* HEADER — style glass Telegram */}
+        <div style={{ paddingTop:'env(safe-area-inset-top,44px)', paddingLeft:12, paddingRight:12, paddingBottom:10,
+          display:'flex', alignItems:'center', gap:10, flexShrink:0,
+          background:`${c||ACC}dd`, backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)',
+          boxShadow:'0 1px 0 rgba(255,255,255,.12), 0 2px 14px rgba(0,0,0,.15)',
+        }}>
+          {/* Bouton retour — petit cercle */}
+          <button onClick={() => router.push('/chat')} style={{ background:'rgba(255,255,255,.22)', border:'none', borderRadius:'50%', width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff', flexShrink:0, WebkitTapHighlightColor:'transparent' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          {/* Avatar */}
+          <div style={{ width:38, height:38, borderRadius:'50%', overflow:'hidden', flexShrink:0, boxShadow:'0 0 0 2px rgba(255,255,255,.4)' }}>
             {isStatic
-              ? <span style={{ fontSize:18 }}>{(meta as any).avatar}</span>
-              : <Image src={clinicLogoSrc} alt="logo" width={42} height={42} style={{ objectFit:'cover', borderRadius:'50%' }} />
+              ? <div style={{ width:38, height:38, borderRadius:'50%', background:'rgba(255,255,255,.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}>{(meta as any).avatar}</div>
+              : <Image src={clinicLogoSrc} alt="logo" width={38} height={38} style={{ objectFit:'cover' }} />
             }
           </div>
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:15, fontWeight:900, color:'#fff' }}>{meta.name}</div>
-            <div style={{ fontSize:11, color:'rgba(255,255,255,.75)', fontWeight:600 }}>
-              {isStatic ? meta.subtitle : '● En ligne · répond rapidement'}
+          {/* Nom + statut */}
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontSize:15, fontWeight:800, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{meta.name}</div>
+            <div style={{ fontSize:11, color:'rgba(255,255,255,.8)', fontWeight:600 }}>
+              {isStatic ? meta.subtitle : '● en ligne'}
             </div>
           </div>
+          {/* Bouton téléphone */}
+          <button style={{ background:'rgba(255,255,255,.22)', border:'none', borderRadius:'50%', width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff', flexShrink:0, WebkitTapHighlightColor:'transparent' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg>
+          </button>
         </div>
 
         {/* MESSAGES */}
-        <div id="chat-scroll" style={{ flex:1, overflowY:'auto', padding:'12px 12px 88px' }}>
+        <div id="chat-scroll" style={{ flex:1, overflowY:'auto', padding:'12px 10px 100px' }}>
 
           {messages.length === 0 && !isStatic && (
             <div style={{ textAlign:'center', padding:'40px 20px', color:'#94a3b8' }}>
@@ -345,24 +462,43 @@ export default function ChatThreadPage() {
           {messages.map((msg, i) => {
             const isMe = msg.sender_type === 'patient'
             return (
-              <div key={msg.id} style={{ display:'flex', justifyContent: isMe ? 'flex-end' : 'flex-start', marginBottom:8, animation:`msgIn .22s ease ${Math.min(i,4)*0.05}s both` }}>
+              <div key={msg.id} style={{ display:'flex', justifyContent: isMe ? 'flex-end' : 'flex-start', marginBottom:8, animation:`msgIn .22s ease ${Math.min(i,4)*0.05}s both`, flexDirection:'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
+                <div style={{ display:'flex', justifyContent: isMe ? 'flex-end' : 'flex-start', alignItems:'flex-end', gap:6 }}>
                 {!isMe && (
-                  <div style={{ width:28, height:28, borderRadius:'50%', background:`${c}22`, border:`1.5px solid ${c}44`, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', flexShrink:0, marginRight:6, alignSelf:'flex-end' }}>
+                  <div style={{ width:28, height:28, borderRadius:'50%', background:`${c}22`, border:`1.5px solid ${c}44`, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', flexShrink:0 }}>
                     <Image src={clinicLogoSrc} alt="logo" width={28} height={28} style={{ objectFit:'cover' }} />
                   </div>
                 )}
-                <div style={{ maxWidth:'72%', background: isMe ? `linear-gradient(135deg,${c},${ACC2})` : '#fff', color: isMe ? '#fff' : '#1e293b', borderRadius: isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px', padding:'10px 14px', boxShadow:'0 2px 10px rgba(0,0,0,.08)', fontSize:14, fontWeight:600, lineHeight:1.55 }}>
+                <div
+                  onMouseDown={() => { longPressRef.current = setTimeout(() => setDeletingId(msg.id), 600) }}
+                  onMouseUp={() => { if (longPressRef.current) clearTimeout(longPressRef.current) }}
+                  onTouchStart={e => { e.preventDefault(); longPressRef.current = setTimeout(() => setDeletingId(msg.id), 600) }}
+                  onTouchEnd={() => { if (longPressRef.current) clearTimeout(longPressRef.current) }}
+                  style={{ maxWidth:'75%', background: isMe ? `linear-gradient(135deg,${ACC||'#1D9E75'},${ACC2||'#0F6E56'})` : '#fff', color: isMe ? '#fff' : '#1e293b', borderRadius: isMe ? '18px 4px 18px 18px' : '4px 18px 18px 18px', padding: msg.attachment?.type === 'image' ? '4px' : '9px 13px', boxShadow:'0 1px 4px rgba(0,0,0,.16)', fontSize:14, fontWeight:500, lineHeight:1.55, userSelect:'none', cursor:'pointer' }}>
                   {!isMe && <div style={{ fontSize:10, fontWeight:800, color: c, marginBottom:4, opacity:.85 }}>{msg.sender_name}</div>}
 
-                  {/* Attachment */}
-                  {msg.attachment?.type === 'image' && (
-                    <a href={msg.attachment.url} target="_blank" rel="noreferrer" style={{ display:'block', marginBottom:6 }}>
-                      <img src={msg.attachment.url} alt={msg.attachment.label} style={{ maxWidth:'100%', borderRadius:10, display:'block' }} />
-                    </a>
-                  )}
+                  {/* Attachment image — thumbnail cliquable, lightbox au clic */}
+                  {msg.attachment?.type === 'image' && (() => {
+                    const att = msg.attachment!
+                    const openLb = (e: React.SyntheticEvent) => { e.preventDefault(); e.stopPropagation(); setLightbox(att.url) }
+                    return (
+                      <div onClick={openLb} onTouchEnd={openLb} style={{ cursor:'zoom-in', borderRadius:12, overflow:'hidden', marginBottom:4, maxWidth:240, lineHeight:0, position:'relative', userSelect:'none', WebkitUserSelect:'none' }}>
+                        <img src={att.url} alt={att.label} draggable={false} style={{ width:'100%', maxHeight:200, objectFit:'cover', display:'block', borderRadius:12, pointerEvents:'none' }} />
+                        <div style={{ position:'absolute', bottom:5, right:7, background:'rgba(0,0,0,.45)', borderRadius:10, padding:'1px 6px', fontSize:9.5, color:'#fff', fontWeight:700, pointerEvents:'none' }}>
+                          {fmtTime(msg.created_at)}{isMe && ' ✓'}
+                        </div>
+                      </div>
+                    )
+                  })()}
+
+                  {/* Attachment audio — lecteur style WhatsApp */}
                   {msg.attachment?.type === 'audio' && (
-                    <audio controls src={msg.attachment.url} style={{ width:'100%', marginBottom:6, borderRadius:8 }} />
+                    <div style={{ marginBottom:4 }}>
+                      <WAAudioPlayer src={msg.attachment.url} isMe={isMe} />
+                    </div>
                   )}
+
+                  {/* Document */}
                   {msg.attachment?.type === 'document' && (
                     <a href={msg.attachment.url} target="_blank" rel="noreferrer" style={{ display:'flex', alignItems:'center', gap:8, background: isMe ? 'rgba(255,255,255,.2)' : `${c}15`, padding:'8px 10px', borderRadius:10, textDecoration:'none', marginBottom:6 }}>
                       <span style={{ fontSize:20 }}>📎</span>
@@ -370,79 +506,129 @@ export default function ChatThreadPage() {
                     </a>
                   )}
 
-                  {/* Texte */}
-                  <div style={{ whiteSpace:'pre-wrap', wordBreak:'break-word', overflowWrap:'anywhere' }}>{msg.content}</div>
-                  <div style={{ fontSize:10, textAlign:'right', marginTop:4, fontWeight:500, color: isMe ? 'rgba(255,255,255,.65)' : '#94a3b8' }}>
-                    {fmtTime(msg.created_at)}{isMe && ' ✓'}
-                  </div>
+                  {/* Texte — masqué si c'est juste l'emoji placeholder d'une image/audio */}
+                  {!(msg.attachment?.type === 'image' || msg.attachment?.type === 'audio') && (
+                    <div style={{ whiteSpace:'pre-wrap', wordBreak:'break-word', overflowWrap:'anywhere' }}>{msg.content}</div>
+                  )}
+                  {/* Timestamp — masqué pour les images (déjà dans l'overlay) */}
+                  {msg.attachment?.type !== 'image' && (
+                    <div style={{ fontSize:10, textAlign:'right', marginTop:4, fontWeight:500, color: isMe ? 'rgba(255,255,255,.65)' : '#94a3b8' }}>
+                      {fmtTime(msg.created_at)}{isMe && ' ✓'}
+                    </div>
+                  )}
                 </div>
+                </div>
+                {/* Menu suppression (long-press) */}
+                {deletingId === msg.id && (
+                  <div style={{ display:'flex', gap:8, marginTop:4, animation:'msgIn .15s ease both' }}>
+                    <button onClick={() => deleteMsg(msg.id)} style={{ padding:'5px 14px', borderRadius:20, border:'none', background:'#ef4444', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer' }}>🗑 Supprimer</button>
+                    <button onClick={() => setDeletingId(null)} style={{ padding:'5px 12px', borderRadius:20, border:'none', background:'rgba(0,0,0,.12)', color:'#64748b', fontSize:12, fontWeight:700, cursor:'pointer' }}>Annuler</button>
+                  </div>
+                )}
               </div>
             )
           })}
           <div ref={bottomRef} />
         </div>
 
-        {/* INPUT */}
-        <div style={{ flexShrink:0, padding:'8px 12px', background:'#eef2f7', paddingBottom:'calc(8px + env(safe-area-inset-bottom,0px))' }}>
+        {/* INPUT — barre flottante Telegram */}
+        <div style={{ flexShrink:0, padding:'8px 10px', paddingBottom:'calc(10px + env(safe-area-inset-bottom,0px))', background:'transparent' }}>
           {isStatic ? (
-            <div style={{ background:'rgba(255,255,255,.92)', backdropFilter:'blur(16px)', borderRadius:22, padding:'14px 20px', textAlign:'center', fontSize:13, fontWeight:700, color:'#94a3b8', boxShadow:'0 4px 20px rgba(0,0,0,.1)' }}>
+            /* Lecture seule */
+            <div style={{ background:'rgba(255,255,255,.88)', backdropFilter:'blur(16px)', borderRadius:26, padding:'14px 20px', textAlign:'center', fontSize:13, fontWeight:700, color:'#94a3b8', boxShadow:'0 4px 20px rgba(0,0,0,.14)' }}>
               🔔 Canal en lecture seule — messages automatiques
             </div>
+
+          ) : recording ? (
+            /* ── Barre d'enregistrement Telegram ── */
+            <>
+              <style>{`@keyframes rw{0%,100%{transform:scaleY(.12)}50%{transform:scaleY(1)}}`}</style>
+              <div style={{ background:'rgba(255,255,255,.96)', backdropFilter:'blur(20px)', borderRadius:26, padding:'8px 10px 8px 14px', display:'flex', alignItems:'center', gap:10, boxShadow:'0 4px 24px rgba(0,0,0,.18)' }}>
+                {/* Annuler */}
+                <button onClick={cancelRec} style={{ width:34, height:34, borderRadius:'50%', background:'#fee2e2', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#ef4444"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                </button>
+                {/* Waveform animée rouge */}
+                <div style={{ flex:1, display:'flex', alignItems:'center', gap:2, height:32 }}>
+                  {Array.from({length:26}, (_, i) => (
+                    <div key={i} style={{ flex:1, background:'#ef4444', borderRadius:3, height:'100%', transformOrigin:'center', animation:`rw ${0.4+(i%5)*0.11}s ease-in-out ${(i%7)*0.055}s infinite` }} />
+                  ))}
+                </div>
+                {/* Timer rouge */}
+                <span style={{ fontSize:13, fontWeight:800, color:'#ef4444', flexShrink:0, minWidth:36, textAlign:'center', fontVariantNumeric:'tabular-nums' }}>
+                  {`${String(Math.floor(recTime/60)).padStart(2,'0')}:${String(recTime%60).padStart(2,'0')}`}
+                </span>
+                {/* Stop — carré blanc dans cercle rouge */}
+                <button onClick={stopAudioRec} style={{ width:38, height:38, borderRadius:'50%', background:'linear-gradient(135deg,#ef4444,#dc2626)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 4px 12px rgba(239,68,68,.5)', WebkitTapHighlightColor:'transparent' }}>
+                  <div style={{ width:11, height:11, background:'#fff', borderRadius:2 }} />
+                </button>
+              </div>
+            </>
+
           ) : audioBlob ? (
-            /* Prévisualisation message vocal */
-            <div style={{ background:'rgba(255,255,255,.95)', backdropFilter:'blur(16px)', borderRadius:22, padding:'12px 16px', display:'flex', alignItems:'center', gap:10, boxShadow:'0 4px 20px rgba(0,0,0,.12)' }}>
-              <span style={{ fontSize:20 }}>🎤</span>
-              <audio controls src={URL.createObjectURL(audioBlob)} style={{ flex:1, height:36 }} />
-              <button onClick={() => setAudioBlob(null)} style={{ background:'#fee2e2', border:'none', borderRadius:8, padding:'6px 10px', fontSize:12, fontWeight:700, color:'#ef4444', cursor:'pointer' }}>✕</button>
-              <button onClick={sendVoice} disabled={uploading} style={{ background:`linear-gradient(135deg,${ACC2},${ACC})`, border:'none', borderRadius:10, padding:'8px 14px', fontSize:12, fontWeight:800, color:'#fff', cursor:'pointer' }}>
-                {uploading ? '…' : '➤ Envoyer'}
+            /* ── Prévisualisation vocale ── */
+            <div style={{ background:'rgba(255,255,255,.96)', backdropFilter:'blur(20px)', borderRadius:26, padding:'8px 10px 8px 10px', display:'flex', alignItems:'center', gap:8, boxShadow:'0 4px 24px rgba(0,0,0,.18)' }}>
+              <button onClick={() => { setAudioBlob(null); setRecTime(0) }} style={{ width:34, height:34, borderRadius:'50%', background:'#fee2e2', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#ef4444"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+              </button>
+              <div style={{ flex:1 }}>
+                <WAAudioPlayer src={URL.createObjectURL(audioBlob)} isMe={false} />
+              </div>
+              <button onClick={sendVoice} disabled={uploading} style={{ width:40, height:40, borderRadius:'50%', background: uploading ? '#94a3b8' : `linear-gradient(135deg,${ACC2},${ACC})`, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:`0 4px 14px ${ACC}55`, WebkitTapHighlightColor:'transparent' }}>
+                {uploading ? <span style={{ color:'#fff', fontSize:14 }}>…</span> : <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>}
               </button>
             </div>
+
           ) : (
-            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              {/* Bouton fichier — label pour compatibilité iOS Safari */}
-              <label htmlFor="chat-file-input" style={{ width:42, height:42, borderRadius:'50%', flexShrink:0, background:'rgba(255,255,255,.9)', border:`1.5px solid ${ACC}44`, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, WebkitTapHighlightColor:'transparent' }}>
-                📎
-              </label>
+            /* ── Saisie normale — pill Telegram ── */
+            <div style={{ background:'rgba(255,255,255,.96)', backdropFilter:'blur(20px)', borderRadius:26, display:'flex', alignItems:'center', gap:0, boxShadow:'0 4px 24px rgba(0,0,0,.18)', overflow:'visible' }}>
               <input id="chat-file-input" ref={fileRef} type="file" accept="image/*,.pdf,.doc,.docx" style={{ display:'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) sendFile(f); e.target.value = '' }} />
-
+              {/* Emoji / smiley */}
+              <button style={{ width:46, height:46, border:'none', background:'transparent', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:'#94a3b8', fontSize:20, WebkitTapHighlightColor:'transparent' }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2" strokeLinecap="round"/><line x1="9" y1="9" x2="9.01" y2="9" strokeWidth="2.5" strokeLinecap="round"/><line x1="15" y1="9" x2="15.01" y2="9" strokeWidth="2.5" strokeLinecap="round"/></svg>
+              </button>
               {/* Champ texte */}
-              <div style={{ flex:1, background:'rgba(255,255,255,.95)', backdropFilter:'blur(16px)', borderRadius:26, padding:'11px 16px', display:'flex', alignItems:'center', gap:8, boxShadow:'0 4px 20px rgba(0,0,0,.10)', border:'1px solid rgba(0,0,0,.06)' }}>
-                <input
-                  ref={inputRef}
-                  value={text}
-                  onChange={e => setText(e.target.value)}
-                  onKeyDown={handleKey}
-                  placeholder="Écrire un message…"
-                  style={{ flex:1, border:'none', outline:'none', background:'none', fontSize:14, fontFamily:'Nunito,system-ui,sans-serif', fontWeight:600, color:'#1e293b', minWidth:0 }}
-                />
-              </div>
-
-              {/* Bouton envoyer / micro */}
+              <input
+                ref={inputRef}
+                value={text}
+                onChange={e => setText(e.target.value)}
+                onKeyDown={handleKey}
+                placeholder="Message…"
+                style={{ flex:1, border:'none', outline:'none', background:'transparent', fontSize:15, fontFamily:'Nunito,system-ui,sans-serif', fontWeight:600, color:'#1e293b', minWidth:0, padding:'12px 0' }}
+              />
               {text.trim() ? (
-                <button onClick={send} disabled={sending} style={{ width:44, height:44, borderRadius:'50%', flexShrink:0, background:`linear-gradient(135deg,${ACC2},${ACC})`, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, color:'#fff', boxShadow:`0 4px 16px ${ACC}55`, opacity: sending ? .7 : 1 }}>
-                  ➤
+                /* Envoyer */
+                <button onClick={send} disabled={sending} style={{ width:42, height:42, margin:'0 4px 0 0', borderRadius:'50%', flexShrink:0, background:`linear-gradient(135deg,${ACC2},${ACC})`, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:`0 4px 14px ${ACC}55`, opacity: sending ? .7 : 1, WebkitTapHighlightColor:'transparent' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
                 </button>
               ) : (
-                <button
-                  onMouseDown={e => { e.preventDefault(); startAudioRec() }}
-                  onMouseUp={e => { e.preventDefault(); stopAudioRec() }}
-                  onTouchStart={e => { e.preventDefault(); startAudioRec() }}
-                  onTouchEnd={e => { e.preventDefault(); stopAudioRec() }}
-                  title={typeof navigator !== 'undefined' && !navigator.mediaDevices ? 'Micro non disponible (HTTPS requis)' : 'Maintenir pour enregistrer'}
-                  style={{ width:44, height:44, borderRadius:'50%', flexShrink:0, background: recording ? 'linear-gradient(135deg,#ef4444,#dc2626)' : (typeof navigator !== 'undefined' && !navigator.mediaDevices ? '#94a3b8' : `linear-gradient(135deg,${ACC2},${ACC})`), border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow: recording ? '0 4px 20px rgba(239,68,68,.5)' : `0 4px 16px ${ACC}55`, animation: recording ? 'recPulse 1s ease-in-out infinite' : 'none', transition:'background .2s,box-shadow .2s', touchAction:'none', WebkitTapHighlightColor:'transparent' }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <rect x="8" y="1" width="8" height="13" rx="4" fill="white" opacity=".95"/>
-                    <path d="M5 10a7 7 0 0014 0" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity=".95"/>
-                    <line x1="12" y1="17" x2="12" y2="21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                    <line x1="9" y1="21" x2="15" y2="21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </button>
+                <>
+                  {/* Pièce jointe */}
+                  <label htmlFor="chat-file-input" style={{ width:40, height:46, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, WebkitTapHighlightColor:'transparent' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8" strokeLinecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                  </label>
+                  {/* Micro — cercle vert */}
+                  <button onClick={startAudioRec} style={{ width:42, height:42, margin:'0 4px 0 0', borderRadius:'50%', flexShrink:0, background:`linear-gradient(135deg,${ACC2},${ACC})`, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:`0 4px 14px ${ACC}55`, WebkitTapHighlightColor:'transparent' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <rect x="8" y="1" width="8" height="13" rx="4" fill="white" opacity=".95"/>
+                      <path d="M5 10a7 7 0 0014 0" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      <line x1="12" y1="17" x2="12" y2="21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="9" y1="21" x2="15" y2="21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                </>
               )}
             </div>
           )}
         </div>
       </div>
+      {/* Lightbox image */}
+      {lightbox && (
+        <div onClick={() => setLightbox(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.92)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:16, cursor:'zoom-out' }}>
+          <button onClick={() => setLightbox(null)} style={{ position:'absolute', top:18, right:18, background:'rgba(255,255,255,.15)', border:'none', borderRadius:'50%', width:38, height:38, fontSize:20, color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(8px)' }}>✕</button>
+          <img src={lightbox} alt="" style={{ maxWidth:'100%', maxHeight:'90vh', objectFit:'contain', borderRadius:12, boxShadow:'0 8px 40px rgba(0,0,0,.6)' }} onClick={e => e.stopPropagation()} />
+        </div>
+      )}
     </>
   )
 }
